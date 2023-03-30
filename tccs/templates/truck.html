@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Buy Truck Page 
+{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <form method="POST" class="form-truck" style="color:white">
+        {{ form.hidden_tag() }}
+        <h1 class="h3 mb-3 font-weight-normal">
+            Please Fill the details 
+        </h1>
+        <br>
+        {{ form.branchID.label() }}
+        {{ form.branchID(class="form-control", placeholder="branchID") }}
+
+        <br>
+        {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+
+    </form>
+</div>
+{% endblock %}
