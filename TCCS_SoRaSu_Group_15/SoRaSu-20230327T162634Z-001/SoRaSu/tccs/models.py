@@ -150,26 +150,29 @@ class Consignment(db.Model):
         return f'<Consignment: {self.consignment_id},Source Branch:{self.source_branch_id} , Destination Branch: {self.dest_branch_id}, Volume:{self.volume}, status: {self.status}>'
 
 
-class Office(ABC):
+class Office(db.Model):
     officeID = db.Column(db.Integer(),primary_key = True)
-    officeAddress = db.relationship("Address",db.ForeignKey('address.id'))
+    # officeAddress = db.relationship("Address",db.ForeignKey('address.id'))
     officePhone = db.Column(db.String(length=10),nullable=False)
-    employees = db.relationship("Employee")
-    transactions = db.relationship("Bill")
+    type = db.Column(db.String(length =10),nullable=False)
 
-    @abstractclassmethod
+    __mapper_args__ = {
+        'polymorphic_identity': 'office',
+        'polymorphic_on': type
+    }
+
+    # employees = db.relationship("Employee")
+    # transactions = db.relationship("Bill")
+
     def getOfficeID(self):
         return self.officeID
     
-    @abstractclassmethod
     def getOfficeAddress(self):
         return self.officeAddress
 
-    @abstractclassmethod
     def getOfficePhone(self):
         return self.officePhone
     
-    @abstractclassmethod
     def setOfficeAddress(self,addr):
         self.officeAddress = addr
 
@@ -182,17 +185,19 @@ class Office(ABC):
     def removeEmployee(self,id):
         pass
 
-    @abstractclassmethod
     def isBranch(self):
         pass  
 
     def addTransaction(self,b):
         pass
 
-class HeadOffice(db.Model,Office):
-    manager = db.relationship("Manager",db.ForeignKey('manager.id'))
+class HeadOffice(Office):
+    # __metaclass__ = Office
+    # manager = db.relationship("Manager",db.ForeignKey('manager.id'))
+    __mapper_args__ = {
+        'polymorphic_identity': 'head',
+    }
     rate = db.Column(db.Double(),nullable =False)
-
     def isBranch(self):
         return False
 
@@ -202,12 +207,14 @@ class HeadOffice(db.Model,Office):
     def returnRate(self):
         return self.rate  
 
-class BranchOffice(db.Model,Office):
+class BranchOffice(Office):
     truckIDs = db.Column(db.Integer())
-    employees = db.relationship("Employee",db.ForeignKey('employee.id'))
+    # employees = db.relationship("Employee",db.ForeignKey('employee.id'))
     idleTime = db.Column(db.Double())
     # consignmentsID = db.relationship(db.Integer())
-
+    __mapper_args__ = {
+        'polymorphic_identity': 'branch',
+    }
     def isBranch(self):
         return True
 
@@ -218,7 +225,7 @@ class BranchOffice(db.Model,Office):
         return self.transactions
 
     def addTransaction(self, b):
-        return super().addTransaction(b)
+        pass
 
     def addTruckID(self,id):
         pass
