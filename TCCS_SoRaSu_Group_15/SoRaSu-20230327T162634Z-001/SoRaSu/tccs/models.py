@@ -151,70 +151,81 @@ class Consignment(db.Model):
 
 
 class Office(db.Model):
-    officeID = db.Column(db.Integer(),primary_key = True)
-    # officeAddress = db.relationship("Address",db.ForeignKey('address.id'))
-    officePhone = db.Column(db.String(length=10),nullable=False)
-    type = db.Column(db.String(length =10),nullable=False)
+    id = db.Column(db.Integer(), primary_key=True)
+    officeAddressID = db.Column(db.Integer, db.ForeignKey('address.id'))
+    officeAddress = db.relationship('Address', uselist=False, foreign_keys=officeAddressID)
+    employees = db.relationship("Employee", uselist=True, lazy=False)
+
+    transactions = db.relationship(
+        "Bill", foreign_keys='Bill.branchID', uselist=True, lazy=False)
+    
+    officePhone = db.Column(db.String(length=10), nullable=False)
+    type = db.Column(db.String(length=10), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'office',
         'polymorphic_on': type
     }
 
-    # employees = db.relationship("Employee")
-    # transactions = db.relationship("Bill")
-
     def getOfficeID(self):
         return self.officeID
-    
+
     def getOfficeAddress(self):
         return self.officeAddress
 
     def getOfficePhone(self):
         return self.officePhone
-    
-    def setOfficeAddress(self,addr):
+
+    def setOfficeAddress(self, addr):
         self.officeAddress = addr
 
-    def setOfficePhone(self,phone):
+    def setOfficePhone(self, phone):
         self.officePhone = phone
 
-    def addEmployee(self,e):
+    def addEmployee(self, e):
         pass
 
-    def removeEmployee(self,id):
+    def removeEmployee(self, id):
         pass
 
     def isBranch(self):
-        pass  
-
-    def addTransaction(self,b):
         pass
 
+    def addTransaction(self, b):
+        pass
+
+
 class HeadOffice(Office):
-    # __metaclass__ = Office
-    # manager = db.relationship("Manager",db.ForeignKey('manager.id'))
+
+    manager = db.relationship("Manager", db.ForeignKey('manager.id'))
     __mapper_args__ = {
         'polymorphic_identity': 'head',
     }
-    rate = db.Column(db.Double(),nullable =False)
+    rate = db.Column(db.Double(), nullable=False)
+
     def isBranch(self):
         return False
 
-    def setRate(self,rate):
+    def setRate(self, rate):
         self.rate = rate
 
     def returnRate(self):
-        return self.rate  
+        return self.rate
+
 
 class BranchOffice(Office):
-    truckIDs = db.Column(db.Integer())
-    # employees = db.relationship("Employee",db.ForeignKey('employee.id'))
-    idleTime = db.Column(db.Double())
-    # consignmentsID = db.relationship(db.Integer())
+    # idleTime = db.Column(db.Double())
+
+    truckIDs = db.relationship(
+        "Truck", foreign_keys='Truck.branchID', uselist=True, lazy=False)
+
+    consignmentIDs = db.relationship(
+        "Consignment", foreign_keys='Consignment.sourceBranchID', uselist=True, lazy=False)
+
     __mapper_args__ = {
         'polymorphic_identity': 'branch',
     }
+
     def isBranch(self):
         return True
 
@@ -227,22 +238,22 @@ class BranchOffice(Office):
     def addTransaction(self, b):
         pass
 
-    def addTruckID(self,id):
+    def addTruckID(self, id):
         pass
 
-    def removeTruckID(self,id):
+    def removeTruckID(self, id):
         pass
 
     def getIdleTime(self):
         return self.idleTime
 
-    def updateIdleTime(self,t):
+    def updateIdleTime(self, t):
         self.idleTime = t
 
-    def addConsignment(self,id):
+    def addConsignment(self, id):
         pass
 
-    def getCurrentConsignments(self,id):
+    def getCurrentConsignments(self, id):
         return self.consignmentsID
 
 
