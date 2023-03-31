@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Place Consignment Page
+{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <form method="POST" class="form-register" style="color:white">
+        {{ form.hidden_tag() }}
+        <h1 class="h3 mb-3 font-weight-normal">
+            Please place your Consignment
+        </h1>
+        <br>
+        <h3>Sender Details</h3>
+        {{ form.sender_name.label() }}
+        {{ form.sender_name(class="form-control", placeholder="Name") }}
+
+        {{ form.senderAddressLine.label() }}
+        {{ form.senderAddressLine(class="form-control", placeholder="Local Address") }}
+
+        {{ form.sender_city.label() }}
+        {{ form.sender_city(class="form-control", placeholder="City") }}
+
+        {{ form.senderPincode.label() }}
+        {{ form.senderPincode(class="form-control", placeholder="Pincode") }}
+
+        <h3>Receiver Details</h3>
+        {{ form.receiver_name.label() }}
+        {{ form.receiver_name(class="form-control", placeholder="Name") }}
+
+        {{ form.receiverAddressLine .label() }}
+        {{ form.receiverAddressLine (class="form-control", placeholder="Local Address") }}
+
+        {{ form.receiver_city.label() }}
+        {{ form.receiver_city(class="form-control", placeholder="City") }}
+
+        {{ form.receiverPincode.label() }}
+        {{ form.receiverPincode(class="form-control", placeholder="Pincode") }}
+
+        <h3>Consignment Details</h3>
+        {{ form.volume.label() }}
+        {{ form.volume(class="form-control", placeholder="Approximate Volume of goods:") }}
+
+        {{ form.dispatch_branch.label() }}
+        {{ form.dispatch_branch(class="form-control", placeholder="Dispatch Branch") }}
+
+        {{ form.receiver_branch.label() }}
+        {{ form.receiver_branch(class="form-control", placeholder="Receiver Branch") }}
+
+        <br>
+        {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+
+    </form>
+</div>
+{% endblock %}

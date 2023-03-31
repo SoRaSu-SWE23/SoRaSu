@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add New Truck Page
+{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <form method="POST" class="form-register" style="color:white">
+        {{ form.hidden_tag() }}
+        <h1 class="h3 mb-3 font-weight-normal">
+            Please Add the following Truck details
+        </h1>
+        <br>
+        {{ form.truckNumber.label() }}
+        {{ form.truckNumber(class="form-control", placeholder="Truck Number") }}
+
+        {{ form.branchID.label() }}
+        {{ form.branchID(class="form-control", placeholder="Bracnch ID") }}
+        
+        <br>
+        {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+
+    </form>
+</div>
+{% endblock %}

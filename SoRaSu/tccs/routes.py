@@ -1,19 +1,22 @@
-from tccs import app,change
+from tccs import app, change
 from flask import render_template, redirect, url_for, flash
-from tccs.models import Customer, Employee
-from tccs.forms import RegisterCustomerForm, RegisterEmployeeForm, LoginCustomerForm,LoginEmployeeForm
+from tccs.models import Customer, Employee, Consignment, Address, Truck
+from tccs.forms import RegisterCustomerForm, RegisterEmployeeForm, LoginCustomerForm, LoginEmployeeForm, ConsignmentForm, TruckForm
 from tccs import db
-from flask_login import login_user, logout_user, current_user, login_required
+from flask_login import login_user, logout_user,current_user
 
+#-------------------------------------------------------HOME PAGE-----------------------------------------------------------
 @app.route('/')
 @app.route('/home')
 def home_page():
     return render_template('home.html')
 
 
-@app.route('/services')
-def services():
-    return render_template('services.html')
+@app.route('/customer')
+def customer_page():
+    return render_template('customer.html')
+
+#-------------------------------------------------------REGISTER PAGES-----------------------------------------------------------
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
@@ -25,8 +28,8 @@ def register_customer_page():
     if form.validate_on_submit():
         user_to_create = Customer(username=form.username.data,
                                   name=form.name.data,
-                              email_address=form.email_address.data,
-                              password=form.password1.data)
+                                  email_address=form.email_address.data,
+                                  password=form.password1.data)
         db.session.add(user_to_create)
         db.session.commit()
         change("customer")
@@ -45,10 +48,10 @@ def register_employee_page():
     if form.validate_on_submit():
         user_to_create = Employee(username=form.username.data,
                                   name=form.name.data,
-                                email_address=form.email_address.data,
-                              branchID=form.branchID.data,
-                              position=form.position.data,
-                              password=form.password1.data)
+                                  email_address=form.email_address.data,
+                                  branchID=form.branchID.data,
+                                  position=form.position.data,
+                                  password=form.password1.data)
         db.session.add(user_to_create)
         db.session.commit()
         change("employee")
@@ -61,6 +64,8 @@ def register_employee_page():
 
     return render_template('register_employee.html', form=form)
 
+
+#-------------------------------------------------------LOGIN/LOGOUT PAGES-----------------------------------------------------------
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -87,7 +92,7 @@ def login_employee_page():
     if form.validate_on_submit():
         attempted_user = Employee.query.filter_by(username=form.username.data).first()
         if attempted_user and attempted_user.check_password_correction(attempted_password = form.password.data):
-             change("employee")
+            change("employee")
             login_user(attempted_user)
             flash(f"You are logged in as: {attempted_user.username}",category='success')
             return redirect(url_for('home_page'))
@@ -100,6 +105,59 @@ def logout_page():
     logout_user()
     flash("You have been logged out",category="info")
     return redirect(url_for("home_page"))
+
+
+#-------------------------------------------------------PLACE_CONSIGNMENT PAGE-----------------------------------------------------------
+
+@app.route('/place_consignment', methods=['GET', 'POST'])
+def place_consignment_page():
+    form = ConsignmentForm()
+    if form.validate_on_submit():
+
+        senderName = form.sender_name.data
+        senderAddress = Address(addr=form.senderAddressLine.data,
+                                city=form.sender_city.data, pincode=form.senderPincode.data)
+        db.session.add(senderAddress)
+        db.session.commit()
+        receiverName = form.receiver_name.data
+        receiverAddress = Address(addr=form.receiverAddressLine.data,
+                                  city=form.receiver_city.data, pincode=form.receiverPincode.data)
+        db.session.add(receiverAddress)
+        db.session.commit()
+        consignment_to_create = Consignment(volume=form.volume.data,
+                                            sender_name = senderName,
+                                            receiver_name = receiverName,
+                                            senderAddress_id = senderAddress.id,
+                                            receiverAddress_id = receiverAddress.id,
+                                            sourceBranchID = form.dispatch_branch.data,
+                                            destinationBranchID = form.receiver_branch.data)
+        db.session.add(consignment_to_create)
+        db.session.commit()
+        
+        flash(f"Consignment {consignment_to_create.consignment_id} created successfully by {current_user.username}",category="success")
+        return redirect(url_for('home_page'))
+    if form.errors!={}:
+        for err_msg in form.errors.values():
+            flash(f'There is was error creating a consignment:{err_msg}',category='danger') 
+    return render_template('place_consignment.html',form=form)
+
+#-------------------------------------------------------ADD_NEW_TRUCK PAGE-----------------------------------------------------------
+
+@app.route('/add_truck', methods=['GET', 'POST'])
+def add_truck_page():
+    form = TruckForm()
+    if form.validate_on_submit():
+        truck_to_create = Truck(branch_id = form.branchID.data,
+                                truckNumber = form.truckNumber.data)
+        db.session.add(truck_to_create)
+        db.session.commit()
+        flash(f"Truck added successfully!", category='success')
+        return redirect(url_for('home_page'))
+    if form.errors != {}: #If there are not errors from the validations
+        for err_msg in form.errors.values():
+            flash(f'There was an error with adding a truck {err_msg}', category='danger')
+
+    return render_template('add_new_truck.html', form=form)
 
 
 
