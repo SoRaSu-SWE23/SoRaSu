@@ -106,12 +106,12 @@ class Employee(db.Model, UserMixin):
     branchID = db.Column(db.Integer(),db.ForeignKey("office.id"))
     position = db.Column(db.String(length=30), nullable=False)
     password_hash = db.Column(db.String(length=60), nullable=False)
-    # role = db.Column(db.String(64))
+    role = db.Column(db.String(64))
 
     __mapper_args__ = {
 
         'polymorphic_identity': 'employee',
-        'polymorphic_on': position
+        'polymorphic_on': role
     }
 
     def __init__(self, **kwargs) -> None:
@@ -205,7 +205,6 @@ class Truck(db.Model):
     volumeConsumed = db.Column(db.Double(), nullable=False, default=0) # Volume consumed is in metre cube
     usageTime = db.Column(db.Integer(),default=0) # Usage time is in hours
     idleTime = db.Column(db.Integer(),default=0) # Idle time is in hours
-    # branch = db.relationship('Address', uselist=False, foreign_keys=currentBranch)
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.status = TruckStatus.AVAILABLE
@@ -477,8 +476,15 @@ class Consignment(db.Model):
 
 with app.app_context():
     db.create_all()
-    # customer1 = Customer.query.filter_by(id=1)
-    # employee1 = Employee.query.filter_by(id=1)
-    # manager1 = Manager.query.filter_by(id=1)
+    # address = Address(addr="ms",city="kharagpur",pincode="721302")
+    # db.session.add(address)
+    # office = HeadOffice(rate=10,officeAddressID=address.id,officePhone="9090909")
+    # address1 = Address(addr="vs",city="kgp",pincode="123445") 
+    # db.session.add(address1)
+    # b1 = BranchOffice(rate='10',officeAddressID=address1.id,officePhone="9843843",idleTime=23)
+    # db.session.add(office)
+    # db.session.add(b1)
+    # db.session.commit()
+
 
 
