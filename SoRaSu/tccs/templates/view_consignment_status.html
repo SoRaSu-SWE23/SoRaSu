@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+View Consignment Status Page
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div id="toolbar">
+        <select class="form-control">
+            <option value="">Export Basic</option>
+            <option value="all">Export All</option>
+            <option value="selected">Export Selected</option>
+        </select>
+    </div>
+
+    <table id="table" data-toggle="table" data-search="true" data-filter-control="true" data-show-export="true"
+        data-click-to-select="true" data-toolbar="#toolbar">
+        <thead>
+            <tr>
+                <th data-field="state" data-checkbox="true"></th>
+                <th data-field="id" data-filter-control="input" data-sortable="true">ID</th>
+                <th data-field="source branch" data-filter-control="input" data-sortable="true">Source Branch</th>
+                <th data-field="destination branch" data-filter-control="input" data-sortable="true">Destination Branch</th>
+                <th data-field="order date" data-filter-control="select" data-sortable="true">Order Date</th>
+                <th data-field="status" data-filter-control="select" data-sortable="true">Status</th>
+                <th data-field="action" data-sortable="true">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for consignment in consignments %}
+            <tr>
+                <td class="bs-checkbox "><input data-index="0" name="btSelectItem" type="checkbox"></td>
+                <td>{{ consignment.id }}</td>
+                <td>{{ branch_city[consignment.sourceBranchID] }}</td>
+                <td>{{ branch_city[consignment.destinationBranchID] }}</td>
+                <td>{{ consignment.order_date_time.strftime(" %d - %m - %Y ") }}</td>
+                <td>{{ consignment.status.name }}</td>
+                <td>12/20</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
