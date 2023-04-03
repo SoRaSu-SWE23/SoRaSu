@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Track Consignment Page
+{% endblock %}
+
+{% block content %}
+
+<div id="timeline">
+    <div class="timeline">
+        <ul>
+            <li class="glow">
+                <span>
+                    {{ consignment.order_date_time.strftime(" %d - %m - %Y ") }}
+                </span>
+                <br>
+                <span>
+                    {{ consignment.order_date_time.strftime(" %H : %M ") }}
+                </span>
+                <div class="content">
+                    <h3>Comsignment Place</h3>
+                    <p>
+                        Your Consignment Order is placed successfully :)
+                    </p>
+                </div>
+            </li>
+            {% if consignment.status != ConsignmentStatus.PENDING %}
+            <li class="glow">
+                <span>{{ consignment.approval_date_time.strftime(" %d - %m - %Y ") }}</span>
+                <br>
+                <span>
+                    {{ consignment.approval_date_time.strftime(" %H : %M ") }}
+                </span>
+                <div class="content">
+                    <h3>Consignment Approved</h3>
+                    <p>
+                        Your Consignment is approved by our facility successfully !
+                    </p>
+                </div>
+                {% else %}
+                <li>
+                <div class="content">
+                    <h3 style="color: rgb(79, 80, 80);">Consignment Approved</h3>
+                </div>
+                {% endif %}
+            </li>
+            {% if consignment.status != ConsignmentStatus.PENDING and consignment.status != ConsignmentStatus.APPROVED %}
+            <li class="glow">
+                <span>{{ consignment.dispatch_date_time.strftime(" %d - %m - %Y ") }}</span>
+                <br>
+                <span>
+                    {{ consignment.dispatch_date_time.strftime(" %H : %M ") }}
+                </span>
+                <div class="content">
+                    <h3>Consignment Dispatched</h3>
+                    <p>
+                        Your Consignment is dispatched from our branch facility successfully !
+                    </p>
+                </div>
+                {% else %}
+            <li>
+                <div class="content">
+                    <h3 style="color: rgb(79, 80, 80);">Consignment Dispatched</h3>
+                </div>
+                {% endif %}
+            </li>
+            {% if consignment.status != ConsignmentStatus.PENDING and consignment.status != ConsignmentStatus.APPROVED and consignment.status != ConsignmentStatus.DISPATCHED %}
+            <li class="glow">
+                <div class="content">
+                    <h3>Consignment Enroute</h3>
+                    <p>
+                        Your Consignment is safely enroute in our transport facility successfully !
+                    </p>
+                </div>
+                {% else %}
+                <li>
+                <div class="content">
+                    <h3 style="color: rgb(79, 80, 80);">Consignment Enroute</h3>
+                </div>
+                {% endif %}
+            </li>
+            {% if consignment.status == ConsignmentStatus.DELIVERED %}
+            <li class="glow">
+                <span>{{ consignment.arrival_date_time.strftime(" %d - %m - %Y ") }}</span>
+                <br>
+                <span>
+                    {{ consignment.arrival_date_time.strftime(" %H : %M ") }}
+                </span>
+                <div class="content">
+                    <h3>Consignment Delivered</h3>
+                    <p>
+                        Your Consignment is delivered at our facility successfully !
+                    </p>
+                </div>
+                {% else %}
+                <li>
+                <div class="content">
+                    <h3 style="color: rgb(79, 80, 80);">Consignment Delivered</h3>
+                </div>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

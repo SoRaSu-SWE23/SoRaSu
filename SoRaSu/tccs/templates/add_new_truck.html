@@ -1,26 +1,33 @@
-{% extends 'base.html' %}
 
+
+{% extends 'base.html' %}
 {% block title %}
-    Add New Truck Page
+    Add Truck Page
 {% endblock %}
 
 {% block content %}
-<div class="container text-center">
-    <form method="POST" class="form-register" style="color:white">
-        {{ form.hidden_tag() }}
-        <h1 class="h3 mb-3 font-weight-normal">
-            Please Add the following Truck details
-        </h1>
-        <br>
-        {{ form.truckNumber.label() }}
-        {{ form.truckNumber(class="form-control", placeholder="Truck Number") }}
-
-        {{ form.branchID.label() }}
-        {{ form.branchID(class="form-control", placeholder="Bracnch ID") }}
-        
-        <br>
-        {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
-
-    </form>
+<div class="container" style="max-width: 40rem; opacity: 0.8;">
+    <div class="container">
+    <div id="unique_login" class=" container login-form d-flex flex-column bd-highlight mb-3 mt-5" style="width: 100%; height:fit-content;">
+        <form method="POST">
+            <div class="text">
+                Add the Truck details
+            </div>
+            {{ form.hidden_tag() }}
+            <div class="field">
+                <div class="fas fa-user"></div>
+                {{ form.truckNumber(class="form-control", type="text", placeholder="Truck Number") }}
+            </div>
+            <div class="field">
+                <div class="fas fa-lock"></div>
+                {{ form.branchID(class="form-control", type="text", placeholder="Bracnch ID") }}
+            </div>
+            <div class="field">
+                {{ form.submit() }}
+            </div>
+        </form>
+    </div>
 </div>
+</div>
+
 {% endblock %}

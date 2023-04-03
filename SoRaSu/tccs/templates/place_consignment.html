@@ -1,3 +1,5 @@
+
+
 {% extends 'base.html' %}
 
 {% block title %}
@@ -5,52 +7,75 @@
 {% endblock %}
 
 {% block content %}
-<div class="container text-center">
-    <form method="POST" class="form-register" style="color:white">
-        {{ form.hidden_tag() }}
-        <h1 class="h3 mb-3 font-weight-normal">
-            Please place your Consignment
-        </h1>
-        <br>
-        <h3>Sender Details</h3>
-        {{ form.sender_name.label() }}
-        {{ form.sender_name(class="form-control", placeholder="Name") }}
-
-        {{ form.senderAddressLine.label() }}
-        {{ form.senderAddressLine(class="form-control", placeholder="Local Address") }}
-
-        {{ form.sender_city.label() }}
-        {{ form.sender_city(class="form-control", placeholder="City") }}
-
-        {{ form.senderPincode.label() }}
-        {{ form.senderPincode(class="form-control", placeholder="Pincode") }}
-
-        <h3>Receiver Details</h3>
-        {{ form.receiver_name.label() }}
-        {{ form.receiver_name(class="form-control", placeholder="Name") }}
-
-        {{ form.receiverAddressLine .label() }}
-        {{ form.receiverAddressLine (class="form-control", placeholder="Local Address") }}
-
-        {{ form.receiver_city.label() }}
-        {{ form.receiver_city(class="form-control", placeholder="City") }}
-
-        {{ form.receiverPincode.label() }}
-        {{ form.receiverPincode(class="form-control", placeholder="Pincode") }}
-
-        <h3>Consignment Details</h3>
-        {{ form.volume.label() }}
-        {{ form.volume(class="form-control", placeholder="Approximate Volume of goods:") }}
-
-        {{ form.dispatch_branch.label() }}
-        {{ form.dispatch_branch(class="form-control", placeholder="Dispatch Branch") }}
-
-        {{ form.receiver_branch.label() }}
-        {{ form.receiver_branch(class="form-control", placeholder="Receiver Branch") }}
-
-        <br>
-        {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
-
-    </form>
+<div class="container" style="max-width: 40rem; opacity: 0.8;">
+    <div >
+        <div id="unique_login" class=" container login-form d-flex flex-column bd-highlight mb-3 mt-5"
+            style="width: 100%; height:fit-content;">
+            <form method="POST" class="container">
+                {{ form.hidden_tag() }}
+                <div class="text">
+                    PLACE YOUR CONSIGNMENT
+                    <br><br>
+                </div>
+                <div class="text">
+                    Sender Details
+                </div>
+                <div class="field">
+                    <div class="fas fa-sharp fa-light fa-face-smile-beam"></div>
+                    {{ form.sender_name(class="form-control", type="text", placeholder="Sender's Name") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-light fa-location-dot"></div>
+                    {{ form.senderAddressLine(class="form-control", type="text", placeholder="Local Address") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-light fa-location-dot"></div>
+                    {{ form.sender_city(class="form-control", type="text", placeholder="City") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-light fa-location-dot"></div>
+                    {{ form.senderPincode(class="form-control", type="text", placeholder="Pincode") }}
+                </div>
+                <div class="text">
+                    Receiver Details
+                </div>
+                <div class="field">
+                    <div class="fas fa-sharp fa-light fa-face-smile-beam"></div>
+                    {{ form.receiver_name(class="form-control", type="text", placeholder="Revceiver's Name") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-light fa-location-dot"></div>
+                    {{ form.receiverAddressLine(class="form-control", type="text", placeholder="Local Address") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-light fa-location-dot"></div>
+                    {{ form.receiver_city(class="form-control", type="text", placeholder="City") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-light fa-location-dot"></div>
+                    {{ form.receiverPincode(class="form-control", type="text", placeholder="Pincode") }}
+                </div>
+                <div class="text">
+                    Consignment Details
+                </div>
+                <div class="field">
+                    <div class="fas fa-sharp fa-light fa-weight-hanging"></div>
+                    {{ form.volume(class="form-control", type="text", placeholder="Approximate Volume of goods:") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-sharp fa-light fa-arrow-right"></div>
+                    {{ form.dispatch_branch(class="form-control", type="text", placeholder="Dispatch Branch") }}
+                </div>
+                <div class="field">
+                    <div class="fas fa-sharp fa-light fa-arrow-left"></div>
+                    {{ form.receiver_branch(class="form-control", type="text", placeholder="Receiver Branch") }}
+                </div>
+                <div class="field">
+                    {{ form.submit() }}
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

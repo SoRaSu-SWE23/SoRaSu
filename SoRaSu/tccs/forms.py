@@ -77,3 +77,12 @@ class TruckForm(FlaskForm):
     truckNumber = StringField(label='Truck Number',validators=[Length(min=2,max=10),DataRequired()])
     branchID = IntegerField(label='Branch ID: ',validators=[DataRequired()])
     submit = SubmitField(label='Add truck')
+
+#---------------------------------------------------------------------------------------------------------------------------
+
+class BranchQueryForm(FlaskForm):
+    Branch = IntegerField(label='Branch ID:', validators=[DataRequired()])
+    submit = SubmitField(label='Sign in')
+
+
+
