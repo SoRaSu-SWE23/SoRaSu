@@ -9,7 +9,7 @@ Track Consignment Page
 <div id="timeline">
     <div class="timeline">
         <ul>
-            <li>
+            <li class="glow">
                 <span>
                     {{ consignment.order_date_time.strftime(" %d - %m - %Y ") }}
                 </span>
@@ -24,8 +24,8 @@ Track Consignment Page
                     </p>
                 </div>
             </li>
-            <li>
-                {% if consignment.status != ConsignmentStatus.PENDING %}
+            {% if consignment.status != ConsignmentStatus.PENDING %}
+            <li class="glow">
                 <span>{{ consignment.approval_date_time.strftime(" %d - %m - %Y ") }}</span>
                 <br>
                 <span>
@@ -38,12 +38,14 @@ Track Consignment Page
                     </p>
                 </div>
                 {% else %}
+                <li>
                 <div class="content">
                     <h3 style="color: rgb(79, 80, 80);">Consignment Approved</h3>
                 </div>
                 {% endif %}
-            <li>
-                {% if consignment.status != ConsignmentStatus.PENDING and consignment.status != ConsignmentStatus.APPROVED %}
+            </li>
+            {% if consignment.status != ConsignmentStatus.PENDING and consignment.status != ConsignmentStatus.APPROVED %}
+            <li class="glow">
                 <span>{{ consignment.dispatch_date_time.strftime(" %d - %m - %Y ") }}</span>
                 <br>
                 <span>
@@ -56,13 +58,14 @@ Track Consignment Page
                     </p>
                 </div>
                 {% else %}
+            <li>
                 <div class="content">
                     <h3 style="color: rgb(79, 80, 80);">Consignment Dispatched</h3>
                 </div>
                 {% endif %}
             </li>
-            <li>
-                {% if consignment.status != ConsignmentStatus.PENDING and consignment.status != ConsignmentStatus.APPROVED and consignment.status != ConsignmentStatus.DISPATCHED %}
+            {% if consignment.status != ConsignmentStatus.PENDING and consignment.status != ConsignmentStatus.APPROVED and consignment.status != ConsignmentStatus.DISPATCHED %}
+            <li class="glow">
                 <div class="content">
                     <h3>Consignment Enroute</h3>
                     <p>
@@ -70,13 +73,14 @@ Track Consignment Page
                     </p>
                 </div>
                 {% else %}
+                <li>
                 <div class="content">
                     <h3 style="color: rgb(79, 80, 80);">Consignment Enroute</h3>
                 </div>
                 {% endif %}
             </li>
-            <li>
-                {% if consignment.status == ConsignmentStatus.DELIVERED %}
+            {% if consignment.status == ConsignmentStatus.DELIVERED %}
+            <li class="glow">
                 <span>{{ consignment.arrival_date_time.strftime(" %d - %m - %Y ") }}</span>
                 <br>
                 <span>
@@ -89,6 +93,7 @@ Track Consignment Page
                     </p>
                 </div>
                 {% else %}
+                <li>
                 <div class="content">
                     <h3 style="color: rgb(79, 80, 80);">Consignment Delivered</h3>
                 </div>

@@ -85,4 +85,17 @@ class BranchQueryForm(FlaskForm):
     submit = SubmitField(label='Sign in')
 
 
+class ApproveTruckForm(FlaskForm):
+    submit = SubmitField(label="Approve Truck")
+
+class DispatchTruckForm(FlaskForm):
+    submit = SubmitField(label="Truck Enroute")
+
+class ReceiveTruckForm(FlaskForm):
+    submit = SubmitField(label="Truck Reached")
+
+class ApproveIncomingTruckForm(FlaskForm):
+    submit = SubmitField(label="Approve Incoming Truck")
+
+
 

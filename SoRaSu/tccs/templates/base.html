@@ -10,7 +10,6 @@
         integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="extensions/filter-control/bootstrap-table-filter-control.css">
-
     <title>
         {% block title %}
 
@@ -37,7 +36,6 @@
             <ul class="navbar-nav mr-auto">
                 {% if current_user.is_authenticated %}
                 <li class="nav-item active">
-                    <!-- ***************************RAJ CHANGE******************************************   -->
                     <a class="nav-link" href="{{ url_for('dashboard_page') }}">Dashboard <span
                             class="sr-only">(current)</span></a>
                 </li>
@@ -106,7 +104,7 @@
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script>
-        //exporte les données sélectionnées
+
         var $table = $('#table');
         $(function () {
             $('#toolbar').find('select').change(function () {
@@ -122,14 +120,6 @@
             $(this).toggleClass("bold-blue");
         });
     </script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.1/extensions/editable/bootstrap-table-editable.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.1/extensions/export/bootstrap-table-export.js"></script>
-    <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.1/extensions/filter-control/bootstrap-table-filter-control.js"></script>
-
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -150,7 +140,7 @@
 
                 $.extend($.expr[':'], {
                     'containsi': function (elem, i, match, array) {
-                        return (elem.textContent || elem.innerText || '').toUpperCase().indexOf((match[3] || "").toUpperCase()) >= 0;
+                        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
                     }
                 });
 
@@ -170,6 +160,58 @@
             });
         });
     </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $('#printInvoice').click(function () {
+            Popup($('.invoice')[0].outerHTML);
+            function Popup(data) {
+                window.print();
+                return true;
+            }
+        });
+    </script>
+     <script>
+        const [form] = document.forms;
+        const feedback = document.querySelector('.feedback');
+        const table = document.querySelector('table');
+        const tbodyRows = [...table.tBodies[0].rows];
+
+        const getCellValue = cell => {
+            return cell.innerText || cell.textContent;
+        }
+
+        form.searchBox.addEventListener('input', e => {
+            const term = e.target.value.toLowerCase();
+            const hasValue = !!e.target.value.length;
+            let resultCount = 0;
+
+            tbodyRows.forEach(row => {
+                const cells = row.querySelectorAll('td:not([data-searchable="false"])');
+                let isFound = false;
+
+                cells.forEach(cell => {
+                    const value = getCellValue(cell).toLowerCase();
+                    const isMatch = value.includes(term);
+
+                    if (isMatch) {
+                        isFound = true;
+                    }
+
+                    cell.classList.toggle('is-match', hasValue && isMatch);
+                });
+
+                row.classList.toggle('is-hidden', !isFound);
+                resultCount += isFound ? 1 : 0;
+            });
+
+            feedback.textContent = hasValue
+                ? resultCount === 1
+                    ? 'Showing 1 result'
+                    : `Showing ${resultCount} results`
+                : null;
+        });
+    </script>
+
 </body>
 <style>
     body {
@@ -360,12 +402,13 @@
         font-weight: 600;
         color: #0cc652;
         position: relative;
+        z-index: 10;
     }
 
     p.price span:before {
         position: absolute;
         content: "₹";
-        font-size: 16px;
+        font-size: 1.75rem;
         top: 25px;
         font-weight: 300;
         left: 0;
@@ -1025,6 +1068,8 @@
     /* TABLES
 ------------------------------------------------------------*/
 
+    @import url('https://fonts.googleapis.com/css2?family=Signika+Negative&display=swap');
+
     #table .bold-blue {
         font-weight: bold;
         color: #0277BD;
@@ -1127,7 +1172,9 @@
         color: #fff;
         background-color: rgba(255, 255, 255, 0.2);
         font-size: 1.2rem;
-        font-weight: 800;
+        /* font-weight: 800; */
+        font-family: cursive;
+        /* font-style: italic; */
         /* text-transform: uppercase; */
         padding: 12px;
         border: none;
@@ -1135,7 +1182,7 @@
 
     #table .panel .panel-body .table tbody tr td {
         color: #fff;
-        font-size: 1.1rem;
+        font-size: 0.9rem;
         padding: 10px 12px;
         vertical-align: middle;
         border: none;
@@ -1261,17 +1308,18 @@
         }
     }
 
+
     /* TIMELINE
 ------------------------------------------------------------*/
     @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
     #timeline {
         padding: 0px;
-        margin: 0px;
+        margin: 1rem;
         box-sizing: border-box;
         font-family: 'Poppins', sans-serif;
         perspective: 800px;
-        background-color: #227093;
+        /* background-color: #227093; */
         width: 100%;
         min-height: 100vh;
         display: flex;
@@ -1281,10 +1329,11 @@
 
     #timeline .timeline {
         width: 800px;
-        background-color: #072736;
+        background-color: #052e41;
         color: #fff;
         padding: 30px 20px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, .5);
+        opacity: 0.8;
     }
 
     #timeline .timeline ul {
@@ -1302,15 +1351,15 @@
 
     #timeline .timeline ul li span {
         display: inline-block;
-        background-color: #1685b8;
+        background-color: #0b8867;
         border-radius: 25px;
-        padding: 2px 5px;
+        padding: 2px 10px;
         font-size: 15px;
         text-align: center;
     }
 
     #timeline .timeline ul li .content h3 {
-        color: #34ace0;
+        color: #0dd49f;
         font-size: 17px;
         padding-top: 5px;
     }
@@ -1332,11 +1381,12 @@
         transition: .5s;
     }
 
-    #timeline .timeline ul li:hover {
+
+    #timeline .timeline ul li.glow {
         background-color: #071f2a;
     }
 
-    #timeline .timeline ul li:hover:before {
+    #timeline .timeline ul li.glow:before {
         background-color: #0F0;
         box-shadow: 0px 0px 10px 2px #0F0;
     }
@@ -1354,7 +1404,175 @@
 
     }
 
-</style>
+    /* INVOICE
+------------------------------------------------------------*/
+    #invoice {
+        padding: 30px;
+    }
 
+    .invoice {
+        position: relative;
+        background-color: #2d2d2d;
+        opacity: 0.8;
+        min-height: 680px;
+        padding: 15px;
+        border-radius: 1rem;
+    }
+
+    .invoice header {
+        padding: 10px 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #193d58
+    }
+
+    .invoice .company-details {
+        text-align: right
+    }
+
+    .invoice .company-details .name {
+        margin-top: 0;
+        margin-bottom: 0
+    }
+
+    .invoice .contacts {
+        margin-bottom: 20px
+    }
+
+    .invoice .invoice-to {
+        text-align: left
+    }
+
+    .invoice .invoice-to .to {
+        margin-top: 0;
+        margin-bottom: 0
+    }
+
+    .invoice .invoice-details {
+        text-align: right
+    }
+
+    .invoice .invoice-details .invoice-id {
+        margin-top: 0;
+        color: #d2d2d2
+    }
+
+    .invoice main {
+        padding-bottom: 50px
+    }
+
+    .invoice main .thanks {
+        margin-top: -100px;
+        font-size: 2em;
+        margin-bottom: 50px
+    }
+
+    .invoice main .notices {
+        padding-left: 6px;
+        border-left: 6px solid #235276
+    }
+
+    .invoice main .notices .notice {
+        font-size: 1.2em
+    }
+
+    .invoice table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        margin-bottom: 20px;
+        padding: 2rem;
+        border-radius: 1rem;
+        background: #171717;
+    }
+
+    .invoice table td,
+    .invoice table th {
+        padding: 15px;
+    }
+
+    .invoice table th {
+        white-space: nowrap;
+        font-weight: 400;
+        font-size: 16px
+    }
+
+    .invoice table td h3 {
+        margin: 0;
+        font-weight: 400;
+        color: #3989c6;
+        font-size: 1.2em
+    }
+
+    .invoice table .qty,
+    .invoice table .total,
+    .invoice table .unit {
+        text-align: right;
+        font-size: 1.2em
+    }
+
+    .invoice table .no {
+        color: #2e2d2d;
+        font-size: 1.6em;
+        /* background: #3989c6 */
+    }
+
+    .invoice table .total {
+        /* background: #3989c6; */
+        color: #fff
+    }
+
+    .invoice table tbody tr:last-child td {
+        border: none
+    }
+
+    .invoice table tfoot td {
+        background: 0 0;
+        border-bottom: none;
+        white-space: nowrap;
+        text-align: right;
+        padding: 10px 20px;
+        font-size: 1.2em;
+        border-top: 1px solid #aaa
+    }
+
+    .invoice table tfoot tr:first-child td {
+        border-top: none
+    }
+
+    .invoice table tfoot tr:last-child td {
+        color: #3989c6;
+        font-size: 1.4em;
+        border-top: 1px solid #3989c6
+    }
+
+    .invoice table tfoot tr td:first-child {
+        border: none
+    }
+
+    .invoice footer {
+        width: 100%;
+        text-align: center;
+        color: #777;
+        border-top: 1px solid #aaa;
+        padding: 8px 0
+    }
+
+    @media print {
+        .invoice {
+            font-size: 11px !important;
+            overflow: hidden !important
+        }
+
+        .invoice footer {
+            position: absolute;
+            bottom: 10px;
+            page-break-after: always
+        }
+
+        .invoice>div:last-child {
+            page-break-before: always
+        }
+    }
+</style>
 
 </html>
