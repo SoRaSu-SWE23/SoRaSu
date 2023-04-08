@@ -4,7 +4,7 @@
     }
   </style>
   
-  <div class="modal fade" id="Modal-IncomingTruck-{{ truck.id }}"
+  <div class="modal fade" id="Modal-TruckAvailable-{{ truck.id }}"
        tabindex="-1"
        aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -20,11 +20,11 @@
         </div>
         <div class="modal-body">
           <form method="POST">
-              {{ approve_incoming_form.hidden_tag() }}
-              <h4 class="text-center">Are you sure you want to approve incoming truck {{ truck.id }} with number {{ truck.truckNumber }}$ ?</h4>
-              <h6 class="text-center">By clicking Approve , you will approve all consignments in the truck</h6>
-              <input id="approve_incoming_truck" name="approve_incoming_truck" type="hidden" value="{{truck.id}}">
-              {{ approve_incoming_form.submit(class="btn btn-outline-success btn-block") }}
+              {{ truck_available_form.hidden_tag() }}
+              <h4 class="text-center">Are you sure you want to make {{ truck.id }} with number {{ truck.truckNumber }} available ?</h4>
+              <h6 class="text-center">By clicking Make Available , you mean that you have reached the source branch</h6>
+              <input id="truck_available" name="truck_available" type="hidden" value="{{truck.id}}">
+              {{ truck_available_form.submit(class="btn btn-outline-success btn-block") }}
           </form>
         </div>
         <div class="modal-footer">

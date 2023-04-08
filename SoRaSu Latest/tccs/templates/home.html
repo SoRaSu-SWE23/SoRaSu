@@ -5,28 +5,28 @@
 {% endblock %}
 
 {% block content %}
-    This is our Home Page
-
-    <div class="container text-center" style="margin-top: 5%;">
-        <div class="row">
-            <div class="col-sm-6">
-              <div class="card">
-                <img src="" class="card-img-top" alt="..." height="500" width="500">
-                <div class="card-body">
-                  <h5 class="card-title">Place Consignment</h5>
-                  <a href="{{ url_for('place_consignment_page') }}" class="btn btn-primary">Place Consignment</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <div class="card">
-                <img src="" class="card-img-top" alt="..." height="500" width="500">
-                <div class="card-body">
-                  <h5 class="card-title">Add a New Truck</h5>
-                  <a href="{{ url_for('add_truck_page') }}" class="btn btn-primary">Add a New Truck</a>
-                </div>
-              </div>
-            </div>
+  
+  <div id="home" class="flex">
+    <div class="container">
+      <div class="row">
+          <div class="col-xl-12 col-lg-12">
+              <div>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                  <h1 >Safe & Reliable <span>Transportation & Logistic</span> Solutions!</h1>
+              </div> 
+              <a href=""><button class="button-44" style="margin-right: 20px;">Know More About Us</button></a>
+              <a href="{{ url_for('register_page') }}"><button class="button-44">Register with us Today!</button></a>
           </div>
-        </div>
+      </div>
+  </div>
+  <style>
+    #home {
+      background-image: url('/static/img/h1_hero.jpg');
+      height: 100vh;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+  </style>
+
+
 {% endblock %}

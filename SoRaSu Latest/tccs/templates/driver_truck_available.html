@@ -19,20 +19,18 @@ View Consignment Status Page
           <tr>
             <th>Truck ID</th>
             <th>Truck Number</th>
-            <th>Source Branch Name</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {% for truck in trucks %}
-          {% include 'includes/incoming_truck_modals.html' %}
+          {% include 'includes/truck_available_modals.html' %}
           <tr>
             <td style="font-weight: 800; font-style: italic; text-align: center;">{{ truck.id }}</td>
             <td>{{ truck.truckNumber }}</td>
-            <td style="margin-left: 1px;">{{ branch_city[truck.branch_id] }}</td>
             <td data-control="select">
               <button class="btn btn-outline btn-success" data-toggle="modal"
-                data-target="#Modal-IncomingTruck-{{ truck.id }}">Approve</button>
+                data-target="#Modal-TruckAvailable-{{ truck.id }}">Make Available</button>
             </td>
           </tr>
           {% endfor %}
@@ -42,4 +40,5 @@ View Consignment Status Page
     <div class="card-footer"></div>
   </div>
 </div>
+
 {% endblock %}

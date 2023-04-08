@@ -32,10 +32,14 @@ View Consignment Status Page
               <td>{{ truck.truckNumber }}</td>
               <td style="margin-left: 1px;">{{ branch_city[truck.branch_id] }}</td>
               <td style="margin-left: 1px;">{{ branch_city[truck.destinationBranch] }}</td>
-              <td data-control="select">
-                <button class="btn btn-outline btn-success" data-toggle="modal"
-                    data-target="#Modal-TruckDispatch-{{ truck.id }}">Dispatch</button>
-            </td>
+              {% if truck.status.name == "ENROUTE" %}
+              <td>Truck Enroute</td>
+              {% else %}
+                <td data-control="select">
+                  <button class="btn btn-outline btn-success" data-toggle="modal"
+                      data-target="#Modal-TruckDispatch-{{ truck.id }}">Dispatch</button>
+                </td>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>

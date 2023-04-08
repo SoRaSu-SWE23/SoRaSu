@@ -37,8 +37,10 @@ class RegisterEmployeeForm(FlaskForm):
     username = StringField(label='User Name:', validators=[Length(min=2, max=30), DataRequired()])
     name = StringField(label='Name:', validators=[Length(min=2, max=30), DataRequired()])
     email_address = StringField(label='Email Address:', validators=[Email(), DataRequired()])
-    branchID = IntegerField(label='Branch ID: ', validators=[DataRequired()])
-    position = StringField(label='Position: ', validators=[DataRequired()])
+    # branchID = IntegerField(label='Branch ID: ', validators=[DataRequired()])
+    branchID = SelectField(label="Choose an option",coerce=int)
+    # position = StringField(label='Position: ', validators=[DataRequired()])
+    position = SelectField(label="Choose a Position",choices=[('Manager','Manager'),('Employee','Employee'),('Driver','Driver')])
     password1 = PasswordField(label='Password:', validators=[Length(min=6), DataRequired()])
     password2 = PasswordField(label='Confirm Password:', validators=[EqualTo('password1'), DataRequired()])
     submit = SubmitField(label='Create Account')
@@ -67,15 +69,18 @@ class ConsignmentForm(FlaskForm):
     receiver_city = StringField(label='Receiver City',validators=[DataRequired(),Length(max=100)])
     receiverPincode = StringField(label='Pincode',validators=[DataRequired(),Length(min=6,max=6)])
     volume = DecimalField(label="Volume",validators=[DataRequired(),NumberRange(min=1,max =1000)])
-    dispatch_branch = IntegerField(label="Dispatch Branch", validators=[DataRequired()])
-    receiver_branch = IntegerField(label="Receiver Branch", validators=[DataRequired()])
+    # dispatch_branch = IntegerField(label="Dispatch Branch", validators=[DataRequired()])
+    # receiver_branch = IntegerField(label="Receiver Branch", validators=[DataRequired()])
+    dispatch_branch = SelectField('Choose an option',coerce=int)
+    receiver_branch = SelectField('Choose an option',coerce=int)
     submit = SubmitField("Proceed") 
 
 #---------------------------------------------------------------------------------------------------------------------------
 
 class TruckForm(FlaskForm):
     truckNumber = StringField(label='Truck Number',validators=[Length(min=2,max=10),DataRequired()])
-    branchID = IntegerField(label='Branch ID: ',validators=[DataRequired()])
+    # branchID = IntegerField(label='Branch ID: ',validators=[DataRequired()])
+    branchID = SelectField('Choose an option',coerce=int)
     submit = SubmitField(label='Add truck')
 
 #---------------------------------------------------------------------------------------------------------------------------
@@ -96,6 +101,9 @@ class ReceiveTruckForm(FlaskForm):
 
 class ApproveIncomingTruckForm(FlaskForm):
     submit = SubmitField(label="Approve Incoming Truck")
+
+class TruckAvailableForm(FlaskForm):
+    submit = SubmitField(label="Make Truck Available")
 
 
 

@@ -147,6 +147,7 @@ class Employee(db.Model, UserMixin):
 
     def setStatus(self,status):
         self.status = status
+        db.session.commit()
     
 class Manager(Employee):
     __tablename__ = "manager"
@@ -210,6 +211,10 @@ class Truck(db.Model):
     usageTime = db.Column(db.Integer(),default=0) # Usage time is in hours
     idleTime = db.Column(db.Integer(),default=0) # Idle time is in hours
     driverID = db.Column(db.Integer(),db.ForeignKey('employee.id'))
+    dispatch_time = db.Column(db.DateTime())
+    arrival_time = db.Column(db.DateTime())
+    journeys = db.Column(db.Integer(),default=0)
+    total_idle_time = db.Column(db.Double(),default=0.0)
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -242,11 +247,13 @@ class Truck(db.Model):
         return self.idleTime
     def viewConsignment(self):
         return self.consignments
-    def setCurrentBranch(self,e):
-        self.currentBranch = e
 
     def setStatus(self,e):
         self.status = e
+        db.session.commit()
+
+    def setSourceBranch(self,i):
+        self.branch_id = i
         db.session.commit()
     
     def setDestinationBranch(self, i):
@@ -257,17 +264,35 @@ class Truck(db.Model):
         self.volumeConsumed +=a
         db.session.commit()
 
+    def setVolumeConsumed(self,a):
+        self.volumeConsumed = a
+        db.session.commit()
+
     def updateUsageTime(self,t):
         self.usageTime = t
         db.session.commit()
 
-    def updateIdleTime(self,t):
-        self.idleTime = t
+    def updateIdleTime(self):
+        difference = self.dispatch_time - self.arrival_time
+        duration_in_s = difference.total_seconds()
+        minutes = divmod(duration_in_s, 60)[0]
+        self.total_idle_time += minutes
+        self.idleTime = self.total_idle_time/self.journeys
+        db.session.commit()
+
+    def setDispatchTime(self):
+        self.dispatch_time = datetime.now()
+        self.journeys += 1
+        db.session.commit()
+
+    def setArrivalTime(self):
+        self.arrival_time = datetime.now()
         db.session.commit()
 
     def setDriverID(self,i):
         self.driverID = i
         db.session.commit()
+
     def allocate_driver(self,token):
         assigned_trucks = list(Truck.query.filter_by(
                 branch_id=token, status=TruckStatus.ASSIGNED))
@@ -284,14 +309,6 @@ class Truck(db.Model):
                 assigned_trucks.remove(truck)
                 break
 
-    def emptyTruck(self):
-        consignments = self.consignments
-        self.volumeConsumed = 0
-        self.consignments =[]
-        self.status = TruckStatus.Available
-        for consignment in consignments :
-            if self in consignment.trucks :
-                consignment.trucks.remove(self)
 
 
 class Office(db.Model):
@@ -368,7 +385,7 @@ class HeadOffice(Office):
 
 class BranchOffice(Office):
     idleTime = db.Column(db.Double())
-    avg_waiting_time = db.Column(db.DateTime())
+    avg_waiting_time = db.Column(db.Double())
     truckIDs = db.relationship(
         "Truck", foreign_keys='Truck.branch_id', uselist=True, lazy=False)
 
@@ -416,13 +433,13 @@ class BranchOffice(Office):
     
     def calAvgWaitTime(self):
         consignment_time = []
-        for consignmentID in self.consignmentIDs:
-            consignment = Consignment.query.filter_by(id=consignmentID).first()
+        for consignment in self.consignmentIDs:
             waiting_time = consignment.dispatch_date_time - consignment.order_date_time
             duration_in_s = waiting_time.total_seconds()
             minutes = divmod(duration_in_s, 60)[0]
             consignment_time.append(minutes)
-        self.avg_waiting_time = sum(consignment_time)/len(consignment_time)
+        if len(consignment_time) != 0:
+            self.avg_waiting_time = sum(consignment_time)/len(consignment_time)
         db.session.commit()
 
 
@@ -449,7 +466,7 @@ class Consignment(db.Model):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.customer_id = current_user.id
+        # self.customer_id = current_user.id
         self.status = ConsignmentStatus.PENDING
         self.order_date_time = timezone.localize(datetime.now())
 
@@ -509,17 +526,6 @@ class Consignment(db.Model):
         self.arrival_date_time = datetime.now()
         db.session.commit()
 
-    def calAvgWaitingTime(self):
-        consignment_time = []
-        for consignmentID in self.consignmentIDs:
-            consignment = Consignment.query.filter_by(id=consignmentID).first()
-            waiting_time = consignment.dispatch_date_time - consignment.order_date_time
-            duration_in_s = waiting_time.total_seconds()
-            minutes = divmod(duration_in_s, 60)[0]
-            consignment_time.append(minutes)
-        self.avg_waiting_time = sum(consignment_time)/len(consignment_time)
-        db.session.commit()
-
     def __repr__(self):
         return f'<Consignment: {self.id},Source Branch:{self.sourceBranchID} , Destination Branch: {self.destinationBranchID}, Volume:{self.volume}, status: {self.status.name}>'
 
@@ -527,21 +533,5 @@ class Consignment(db.Model):
 
 with app.app_context():
     db.create_all()
-    # address = Address(addr="IITKGP",city="Kharagpur",pincode="721302")
-    # db.session.add(address)
-    # db.session.commit()
-    # office = HeadOffice(rate=10,officeAddressID=address.id,officePhone="9090909")
-    # address1 = Address(addr="vs",city="kgp",pincode="123445") 
-    # db.session.add(address1)
-    # db.session.commit()
-    # address2 = Address(addr="vs",city="pune",pincode="988989")
-    # db.session.add(address2)
-    # db.session.commit()
-    # b1 = BranchOffice(rate='10',officeAddressID=address1.id,officePhone="9843843")
-    # b2 = BranchOffice (rate = '10 ' , officeAddressID = address2.id , officePhone = "9088978989" )
-    # db.session.add(b1)
-    # db.session.add(b2)
-    # db.session.add(office)
-    # db.session.commit()
 
 
