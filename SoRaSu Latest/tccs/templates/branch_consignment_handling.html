@@ -6,61 +6,80 @@ Branch Consignment Handling
 
 {% block content %}
 
-<h2 style="text-align: center;">BRANCH STATISTICS</h2>
-<div class="flex" style="text-align: center;">
-<table class="charts-css bar show-heading show-labels" id="my_chart">
-    <caption style="color: white;"> PENDING LIST </caption>
-    <tbody>
-        {% for city in all_branch_city %}
-                <tr>
-                    <th style="font-size: 0.75rem;">{{ city }}</th>
-                    <td style="--size: calc( {{ pending_list[city] }} / 10 )">{{ pending_list[city] }}</td>
-                </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<h2 style="text-align: center; font-family: 'Roboto Condensed', sans-serif;">Branch Consignment Statistics</h2>
+<br>
+<br>
+
+<div class="container" style="border: 2px solid white; border-radius: 1.05rem;">
+    <table class="charts-css bar show-heading show-labels show-10-secondary-axes data-spacing-5" id="my_chart">
+        <caption style="color: white; text-align: center; font-family: 'Roboto Condensed', sans-serif;"> PENDING LIST
+        </caption>
+        <tbody>
+            {% for city in all_branch_city %}
+            <tr>
+                <th style="font-size: 0.75rem;">{{ city }}</th>
+                <td style="--color: #e53d3d; --size: calc( {{ pending_list[city] }} / 10 )">{{ pending_list[city] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+
 <br>
 <br>
 <br>
-<table class="charts-css bar show-heading show-labels" id="my_chart">
-    <caption style="color: white;"> ENROUTE LIST </caption>
-    <tbody>
-        {% for city in all_branch_city %}
-        <tr>
-            <th style="font-size: 0.75rem;">{{ city }}</th>
-            <td style="--size: calc( {{ enroute_list[city] }} / 10 )">{{ enroute_list[city] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<div class="container" style="border: 2px solid white; border-radius: 1.05rem;">
+    <table class="charts-css bar show-heading show-labels show-10-secondary-axes data-spacing-5" id="my_chart">
+        <caption style="color: white; text-align: center; font-family: 'Roboto Condensed', sans-serif;"> ENROUTE LIST
+        </caption>
+        <tbody>
+            {% for city in all_branch_city %}
+            <tr>
+                <th style="font-size: 0.75rem;">{{ city }}</th>
+                <td style="--color: #FFC61A; --size: calc( {{ enroute_list[city] }} / 10 )">{{ enroute_list[city] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <br>
 <br>
 <br>
-<table class="charts-css bar show-heading show-labels" id="my_chart">
-    <caption style="color: white;"> DELIVERED LIST </caption>
-    <tbody>
-        {% for city in all_branch_city %}
-        <tr>
-            <th style="font-size: 0.75rem;">{{ city }}</th>
-            <td style="--size: calc( {{ delivered_list[city] }} / 10 )">{{ delivered_list[city] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<div class="container" style="border: 2px solid white; border-radius: 1.05rem;">
+    <table class="charts-css bar show-heading show-labels show-10-secondary-axes data-spacing-5" id="my_chart">
+        <caption style="color: white; text-align: center; font-family: 'Roboto Condensed', sans-serif;"> DELIVERED LIST
+        </caption>
+        <tbody>
+            {% for city in all_branch_city %}
+            <tr>
+                <th style="font-size: 0.75rem;">{{ city }}</th>
+                <td style="--color: #27c519; --size: calc( {{ delivered_list[city] }} / 10 )">{{ delivered_list[city] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <br>
 <br>
 <br>
-<table class="charts-css bar show-heading show-labels" id="my_chart">
-    <caption style="color: white;"> AVERAGE WAITING TIME </caption>
-    <tbody>
-        {% for city in all_branch_city %}
-        <tr>
-            <th style="font-size: 0.75rem;">{{ city }}</th>
-            <td style="--size: calc( {{ waiting_time_list[city] }} / 10 )">{{ waiting_time_list[city] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<div class="container" style="border: 2px solid white; border-radius: 1.05rem;">
+    <table class="charts-css bar show-heading show-labels show-10-secondary-axes data-spacing-5" id="my_chart">
+        <caption style="color: white; text-align: center; font-family: 'Roboto Condensed', sans-serif;"> AVERAGE WAITING TIME 
+        </caption>
+        <tbody>
+            {% for city in all_branch_city %}
+            <tr>
+                <th style="font-size: 0.75rem;">{{ city }}</th>
+                <td style="--size: calc( {{ waiting_time_list[city] }} / 10 )">{{ waiting_time_list[city] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

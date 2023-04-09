@@ -21,6 +21,7 @@ View Consignment Status Page
             <th>Truck Number</th>
             <th>Source Branch Name</th>
             <th>Avg Idle Time</th>
+            <th>Total truck usage</th>
           </tr>
         </thead>
         <tbody>
@@ -30,6 +31,7 @@ View Consignment Status Page
             <td>{{ truck.truckNumber }}</td>
             <td style="margin-left: 1px;">{{ branch_city[truck.branch_id] }}</td>
             <td>{{truck.idleTime}}</td>
+            <td>{{truck.truckUsage}}</td>
           </tr>
           {% endfor %}
         </tbody>

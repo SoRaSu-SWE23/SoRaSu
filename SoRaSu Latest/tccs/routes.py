@@ -1,14 +1,12 @@
 from tccs import app, change, get
 from flask import render_template, redirect, url_for, flash, request
 from tccs.models import Customer, Employee, Consignment, Address, Truck, ConsignmentStatus, Bill, Manager, Office, TruckStatus, EmployeeStatus, BranchOffice, HeadOffice
-from tccs.forms import RegisterCustomerForm, RegisterEmployeeForm, LoginCustomerForm, LoginEmployeeForm, ConsignmentForm, TruckForm, BranchQueryForm, ApproveTruckForm, DispatchTruckForm, ReceiveTruckForm, ApproveIncomingTruckForm, TruckAvailableForm
+from tccs.forms import RegisterCustomerForm, RegisterEmployeeForm, LoginCustomerForm, LoginEmployeeForm, ConsignmentForm, TruckForm, ApproveTruckForm, DispatchTruckForm, ReceiveTruckForm, ApproveIncomingTruckForm, TruckAvailableForm , ForgotPasswordForm_email, ForgotPasswordForm_password,TruckStatusForm,TruckUsageForm
 from tccs import db
+
 from flask_login import login_user, logout_user, current_user, login_required
 
-
 # -------------------------------------------------------HOME PAGE-----------------------------------------------------------
-
-
 @app.route('/')
 @app.route('/home')
 def home_page():
@@ -18,10 +16,10 @@ def home_page():
         db.session.commit()
         office = HeadOffice(
             rate=10, officeAddressID=address.id, officePhone="9090909")
-        address1 = Address(addr="vs", city="kgp", pincode="123445")
+        address1 = Address(addr="vs", city="kgp", pincode="123445",latitude=22.3235226,longitude=87.3082238)
         db.session.add(address1)
         db.session.commit()
-        address2 = Address(addr="vs", city="pune", pincode="988989")
+        address2 = Address(addr="vs", city="pune", pincode="988989",latitude=18.5292973,longitude=73.8720579)
         db.session.add(address2)
         db.session.commit()
         b1 = BranchOffice(
@@ -73,36 +71,51 @@ def home_page():
 
 # -------------------------------------------------------CUSTOMER PAGE-----------------------------------------------------------
 
+@app.route('/contact_us')
+def contact_us_page():
+    return render_template('contact_us.html')
+# -------------------------------------------------------CUSTOMER PAGE-----------------------------------------------------------
 
 @app.route('/customer')
+@login_required
 def customer_page():
-    return render_template('customer.html')
+    if get() == "customer":
+        return render_template('customer.html')
+    else:
+        return redirect(url_for("login_page"))
 
 # -------------------------------------------------------MANAGER PAGE-----------------------------------------------------------
 
-
 @app.route('/manager')
+@login_required
 def manager_page():
-    return render_template('manager.html')
+    if get() ==  "employee":
+        if current_user.role == 'manager':
+            return render_template('manager.html')
+        else:
+            return redirect(url_for('login_page'))
+    else:
+        return redirect(url_for('login_page'))
+
 
 # -------------------------------------------------------EMPLOYEE PAGE-----------------------------------------------------------
 
-
 @app.route('/employee')
+@login_required
 def employee_page():
     return render_template('employee.html')
 
 # -------------------------------------------------------DRIVER PAGE-----------------------------------------------------------
 
-
 @app.route('/driver')
+@login_required
 def driver_page():
     return render_template('driver.html')
 
 # -------------------------------------------------------DASHBOARD PAGE-----------------------------------------------------------
 
-
 @app.route('/dashboard')
+@login_required
 def dashboard_page():
     if get() == "customer":
         return redirect(url_for('customer_page'))
@@ -149,6 +162,8 @@ def register_customer_page():
 def register_employee_page():
     offices = Office.query.all()
     office_ids = [(i.id, i.officeAddress.city) for i in offices]
+    default = (0,'Select Branch')
+    office_ids.insert(0,default)
     form = RegisterEmployeeForm()
     form.branchID.choices = office_ids
     if form.validate_on_submit():
@@ -242,23 +257,48 @@ def login_employee_page():
             flash("Please try again", category='danger')
     return render_template('login_employee.html', form=form)
 
-
 @app.route('/logout')
+@login_required
 def logout_page():
     logout_user()
     flash("You have been logged out", category="info")
     return redirect(url_for("home_page"))
 
+# -------------------------------------------------------FORGET PASSWORD-----------------------------------------------------------
+@app.route('/forget_password', methods=['GET', 'POST'])
+def forget_password_page():
+    form1 = ForgotPasswordForm_email()
+    form2 = ForgotPasswordForm_password()
+    # if form1.validate_on_submit():
+    #     form.email.data=form1.email.data
+    if form2.validate_on_submit():
+        attempted_user = Customer.query.filter_by(
+            email_address=form1.email.data).first()
+        if attempted_user:
+            attempted_user.set_password(form2.password.data)
+            flash(
+                f"password changed succesfully", category='success')
+            return redirect(url_for('login_customer_page'))
+        else:
+            flash("Please try again", category='danger')
+
+    return render_template('forget_password.html', form2=form2, form1=form1)
+
 
 # -------------------------------------------------------PLACE_CONSIGNMENT PAGE-----------------------------------------------------------
-
 @app.route('/place_consignment', methods=['GET', 'POST'])
+@login_required
 def place_consignment_page():
     offices = Office.query.filter_by(type="branch")
-    office_ids = [(i.id, i.officeAddress.city) for i in offices]
+    source_office_ids = [(i.id, i.officeAddress.city) for i in offices]
+    destination_office_ids = [(i.id, i.officeAddress.city) for i in offices]
+    default = (0,'Select Source Branch')
+    default1 = (0,'Select Destination Branch')
+    source_office_ids.insert(0,default)
+    destination_office_ids.insert(0,default1)
     form = ConsignmentForm()
-    form.dispatch_branch.choices = office_ids
-    form.receiver_branch.choices = office_ids
+    form.dispatch_branch.choices = source_office_ids
+    form.receiver_branch.choices = destination_office_ids
     if form.validate_on_submit():
 
         senderName = form.sender_name.data
@@ -271,7 +311,7 @@ def place_consignment_page():
                                   city=form.receiver_city.data, pincode=form.receiverPincode.data)
         db.session.add(receiverAddress)
         db.session.commit()
-        bill = Bill(amount=100, branch_id=senderAddress.id)
+        bill = Bill( branch_id=senderAddress.id)
         db.session.add(bill)
         db.session.commit()
         consignment_to_create = Consignment(volume=form.volume.data,
@@ -288,7 +328,7 @@ def place_consignment_page():
 
         flash(
             f"Consignment {consignment_to_create.id} created successfully by {current_user.username}", category="success")
-        return redirect(f'/allocate_truck/{consignment_to_create.sourceBranchID}')
+        return redirect(f'/google_maps_routes_bill/{consignment_to_create.id}')
     if form.errors != {}:
         for err_msg in form.errors.values():
             flash(
@@ -328,16 +368,50 @@ def allocate_truck_page(token):
                 available_trucks.remove(truck)
                 assigned_trucks.append(truck)
                 break
-
     return redirect(url_for("dashboard_page"))
+
+@app.route('/allocate_truck_consignment/<token>')
+def allocate_truck_consignment_page(token):
+    branchID = Consignment.query.filter_by(id=token).first().sourceBranchID
+    pending_consignemnts = list(Consignment.query.filter_by(
+        sourceBranchID=branchID, status=ConsignmentStatus.PENDING))
+    available_trucks = list(Truck.query.filter_by(
+        branch_id=branchID, status=TruckStatus.AVAILABLE))
+    assigned_trucks = list(Truck.query.filter_by(
+        branch_id=branchID, status=TruckStatus.ASSIGNED))
+
+    for consignment in pending_consignemnts:
+        for truck in assigned_trucks:
+            if truck.destinationBranch == consignment.destinationBranchID and (truck.volumeConsumed + consignment.volume) <= 500:
+                truck.addVolumeConsumed(consignment.volume)
+                consignment.setTruckId(truck.id)
+                consignment.setStatus(ConsignmentStatus.APPROVED)
+                consignment.setApprovalDateTime()
+                print(consignment.approval_date_time)
+                break
+        if consignment.status == ConsignmentStatus.PENDING:
+            for truck in available_trucks:
+                truck.setStatus(TruckStatus.ASSIGNED)
+                truck.setDestinationBranch(consignment.destinationBranchID)
+                truck.addVolumeConsumed(consignment.volume)
+                consignment.setTruckId(truck.id)
+                consignment.setStatus(ConsignmentStatus.APPROVED)
+                consignment.setApprovalDateTime()
+                print(consignment.approval_date_time)
+                available_trucks.remove(truck)
+                assigned_trucks.append(truck)
+                break
+    return redirect(f'/invoice/{ token }')
 
 
 # -------------------------------------------------------ADD_NEW_TRUCK PAGE-----------------------------------------------------------
-
 @app.route('/add_truck', methods=['GET', 'POST'])
+@login_required
 def add_truck_page():
     offices = Office.query.filter_by(type="branch")
     office_ids = [(i.id, i.officeAddress.city) for i in offices]
+    default = (0,'Select Branch')
+    office_ids.insert(0,default)
     form = TruckForm()
     form.branchID.choices = office_ids
     if form.validate_on_submit():
@@ -355,28 +429,10 @@ def add_truck_page():
 
     return render_template('add_new_truck.html', form=form)
 
-# -------------------------------------------------------BRANCH_QUERY PAGE-----------------------------------------------------------
-
-
-@app.route('/branch_query', methods=['GET', 'POST'])
-def branch_query_page():
-    form = BranchQueryForm()
-    # if form.validate_on_submit():
-    #     attempted_user = Customer.query.filter_by(username=form.username.data).first()
-    #     if attempted_user and attempted_user.check_password_correction(attempted_password = form.password.data):
-    #         change("customer")
-    #         login_user(attempted_user)
-    #         current_user = attempted_user
-    #         flash(f"You are logged in as: {attempted_user.username}",category='success')
-    #         return redirect(url_for('customer_page'))
-    #     else:
-    #         flash("Please try again",category='danger')
-    return render_template('branch_query.html', form=form)
-
 
 # -------------------------------------------------------ORDER_HISTORY(CUSTOMER) PAGE-----------------------------------------------------------
-
 @app.route('/order_history')
+@login_required
 def order_history_page():
     consignments = current_user.consignments
     consignments.reverse()
@@ -384,8 +440,8 @@ def order_history_page():
 
 # -------------------------------------------------------VIEW ALL CONSIGNMENTS(EMPLOYEE) PAGE-----------------------------------------------------------
 
-
 @app.route('/view_consignment_status/<token>')
+@login_required
 def view_consignment_page(token):
     consignments = list(Consignment.query.filter_by(sourceBranchID=token))
     consignments.reverse()
@@ -394,10 +450,10 @@ def view_consignment_page(token):
     for branch in branches:
         branch_city[int(branch.id)] = branch.officeAddress.city
     return render_template('view_consignment_status.html', consignments=consignments, branch_city=branch_city)
+
 # -------------------------------------------------------VIEW PENDING CONSIGNMENTS(EMPLOYEE) PAGE-----------------------------------------------------------
-
-
 @app.route('/view_consignment_status/<token>/pending')
+@login_required
 def branch_pending_consignments_page(token):
     consignments = list(Consignment.query.filter_by(
         sourceBranchID=token, status=ConsignmentStatus.PENDING))
@@ -410,8 +466,6 @@ def branch_pending_consignments_page(token):
     return render_template('view_consignment_status.html', consignments=consignments, branch_city=branch_city)
 
 # -------------------------------------------------------TRACK_CONSIGNMENT(CUSTOMER) PAGE-----------------------------------------------------------
-
-
 @app.route('/track_consignment/<token>')
 @login_required
 def track_consignment_page(token):
@@ -420,7 +474,6 @@ def track_consignment_page(token):
 
 
 # -------------------------------------------------------INVOICE(CUSTOMER) PAGE-----------------------------------------------------------
-
 @app.route('/invoice/<token>')
 @login_required
 def invoice_page(token):
@@ -430,9 +483,8 @@ def invoice_page(token):
     return render_template('invoice.html', bill=bill, consignment=consignment)
 
 # -------------------------------------------------------VIEW CONSIGNMENTS(MANAGER) PAGE-----------------------------------------------------------
-
-
 @app.route('/view_consignment_status', methods=["GET", "POST"])
+@login_required
 def view_consignment_status_page():
     consignments = list(Consignment.query.all())
     consignments.reverse()
@@ -446,6 +498,7 @@ def view_consignment_status_page():
 
 # -------------------------------------------------------VIEW TRUCK STATUS(MANAGER) PAGE-----------------------------------------------------------
 @app.route('/view_truck_status', methods=["GET", "POST"])
+@login_required
 def view_truck_status_page():
     approve_form = ApproveTruckForm()
     if request.method == "POST":
@@ -472,6 +525,7 @@ def view_truck_status_page():
 
 # -------------------------------------------------------VIEW TRUCK STATUS(EMPLOYEE) PAGE-----------------------------------------------------------
 @app.route('/view_truck_status/<token>', methods=["GET", "POST"])
+@login_required
 def view_branch_truck_status_page(token):
     approve_form = ApproveTruckForm()
     if request.method == "POST":
@@ -495,33 +549,9 @@ def view_branch_truck_status_page(token):
             branch_city[int(branch.id)] = branch.officeAddress.city
         return render_template('view_truck_status.html', trucks=trucks, branch_city=branch_city, approve_form=approve_form)
 
-
-# # -------------------------------------------------------ALLOCATE_Driver FUNCTION-----------------------------------------------------------
-# @app.route('/allocate_driver/<token>', methods=["GET", "POST"])
-# def allocate_driver_page(token):
-#     # available_trucks = list(Truck.query.filter_by(branch_id = token, status = TruckStatus.AVAILABLE))
-#     assigned_trucks = list(Truck.query.filter_by(
-#         branch_id=token, status=TruckStatus.ASSIGNED))
-#     drivers = list(Employee.query.filter_by(
-#         branchID=token, status=EmployeeStatus.AVAILABLE, position="Driver"))
-#     print("***************************")
-#     print(assigned_trucks)
-#     print(drivers)
-#     for driver in drivers:
-#         for truck in assigned_trucks:
-#             truck.setDriverID(driver.id)
-#             truck.setStatus(TruckStatus.DISPATCHED)
-#             driver.setStatus(EmployeeStatus.BUSY)
-#             consignments = list(Consignment.query.filter_by(truck_id=truck.id))
-#             for consignment in consignments:
-#                 consignment.setStatus(ConsignmentStatus.DISPATCHED)
-#             assigned_trucks.remove(truck)
-#             break
-
-#     return redirect(url_for("dashboard_page"))
-
 # -------------------------------------------------------AVG WAITING TIME(MANAGER)-----------------------------------------------------------
 @app.route('/avg_wait_time_consignment', methods=["GET", "POST"])
+@login_required
 def avg_wait_time_consignment_page():
     branches = Office.query.filter_by(type="branch")
     branch_city = {}
@@ -534,9 +564,8 @@ def avg_wait_time_consignment_page():
     return render_template('avg_wait_time_consignment.html', branches=branches)
 
 # -------------------------------------------------------DRIVER TRUCK PAGE-----------------------------------------------------------
-
-
 @app.route('/view_assigned_truck/<token>', methods=["GET", "POST"])
+@login_required
 def driver_truck_page(token):
     dispatch_form = DispatchTruckForm()
     if request.method == "POST":
@@ -557,7 +586,7 @@ def driver_truck_page(token):
         else:
             flash(
                 f"Consignment {dispatched_truck_object.id} of volume {dispatched_truck_object.volumeConsumed} cubic meters is not enroute", category="danger")
-        return redirect(url_for('dashboard_page'))
+        return redirect(f'/google_maps_routes_usage/{dispatched_truck}')
 
     if request.method == "GET":
         trucks = list(Truck.query.filter_by(driverID=token))
@@ -568,9 +597,8 @@ def driver_truck_page(token):
         return render_template('driver_truck_assigned.html', trucks=trucks, branch_city=branch_city, dispatch_form=dispatch_form)
 
 # -------------------------------------------------------DRIVER TRUCK RECEIVE PAGE-----------------------------------------------------------
-
-
 @app.route('/driver_truck_receive/<token>', methods=["GET", "POST"])
+@login_required
 def driver_truck_receive_page(token):
     receive_truck_form = ReceiveTruckForm()
     if request.method == "POST":
@@ -578,8 +606,6 @@ def driver_truck_receive_page(token):
         received_truck_object = Truck.query.filter_by(
             id=received_truck).first()
         if received_truck_object:
-            received_truck_object.setStatus(TruckStatus.AVAILABLE)
-            current_user.setStatus(EmployeeStatus.AVAILABLE)
             flash(f"TRUCK {received_truck_object.id} of volume {received_truck_object.volumeConsumed} cubic meters has reached the destination", category="success")
         else:
             flash(
@@ -595,9 +621,8 @@ def driver_truck_receive_page(token):
         return render_template('driver_truck_receive.html', trucks=trucks, branch_city=branch_city, receive_truck_form=receive_truck_form)
 
 # -------------------------------------------------------VIEW INCOMING TRUCK STATUS(EMPLOYEE) PAGE-----------------------------------------------------------
-
-
 @app.route('/view_incoming_truck_status/<token>', methods=["GET", "POST"])
+@login_required
 def view_incoming_truck_status_page(token):
     approve_incoming_form = ApproveIncomingTruckForm()
     if request.method == "POST":
@@ -632,9 +657,8 @@ def view_incoming_truck_status_page(token):
         return render_template('view_incoming_truck_status.html', trucks=trucks, branch_city=branch_city, approve_incoming_form=approve_incoming_form)
 
 # -------------------------------------------------------VIEW AVG TRUCK IDLE TIME-----------------------------------------------------------
-
-
 @app.route('/view_truck_idle_time', methods=['GET', 'POST'])
+@login_required
 def view_truck_idle_time_page():
     trucks = Truck.query.all()
     branches = Office.query.all()
@@ -644,9 +668,8 @@ def view_truck_idle_time_page():
     return render_template('avg_truck_idle_time.html', trucks=trucks, branch_city=branch_city)
 
 # -------------------------------------------------------MAKE TRUCK AVAILABLE(DRIVER) PAGE-----------------------------------------------------------
-
-
 @app.route('/driver_truck_available/<token>', methods=['GET', 'POST'])
+@login_required
 def driver_truck_available_page(token):
     truck_available_form = TruckAvailableForm()
     if request.method == "POST":
@@ -664,7 +687,7 @@ def driver_truck_available_page(token):
         else:
             flash(
                 f"Truck {truck_available_object.id} with truck number { truck_available_object.truckNumber } is not available", category="danger")
-        return redirect(url_for('dashboard_page'))
+        return redirect(url_for(f'/allocate_truck/{truck_available_object.branch_id}'))
 
     if request.method == "GET":
         trucks = list(Truck.query.filter_by(driverID=token,volumeConsumed=0))
@@ -676,6 +699,7 @@ def driver_truck_available_page(token):
     
 # -------------------------------------------------------BRANCH CONSIGNMENT HANDLING-----------------------------------------------------------
 @app.route('/branch_consignment_handling')
+@login_required
 def branch_consignment_handling_page():
     all_consignments = list(Consignment.query.all())
     all_branches = list(Office.query.filter_by(type="branch"))
@@ -701,3 +725,70 @@ def branch_consignment_handling_page():
             delivered_list[branch_city] += 1
 
     return render_template('branch_consignment_handling.html', pending_list=pending_list, enroute_list=enroute_list, delivered_list=delivered_list, all_branch_city=all_branch_city, waiting_time_list=waiting_time_list)
+
+# -------------------------------------------------------GOOGLE MAPS API(DRIVE,MANAGER) PAGE-----------------------------------------------------------
+@app.route('/google_maps/<token>', methods=["GET", "POST"])
+@login_required
+def google_maps_page(token):
+    form = TruckStatusForm()
+    if request.method == "POST":
+        truck = Truck.query.filter_by(
+            driverID=token).first()
+        truck.setLiveLocation(form.Latitude.data, form.Longitude.data)
+
+        flash(
+            f"truck status updated successfully.", category="success")
+        return redirect(url_for('dashboard_page'))
+
+    return render_template('google_maps.html', form=form)
+
+
+@app.route('/manager_google_maps/<token>', methods=["GET", "POST"])
+def manager_google_maps_page(token):
+    truck = Truck.query.filter_by(
+        id=token).first()
+    return render_template('manager_google_maps.html', truck=truck)
+
+@app.route('/google_maps_routes/<token>', methods=["GET", "POST"])
+def google_maps_routes_page(token):
+    truck = Truck.query.filter_by(
+        driverID=token).first()
+    address=Office.query.filter_by(id=truck.destinationBranch).first().officeAddress
+
+    return render_template('google_maps_routes.html',truck=truck,destination_address=address)
+
+@app.route('/google_maps_routes_usage/<token>', methods=["GET", "POST"])
+def google_maps_routes_usage_page(token):
+    form = TruckUsageForm()
+
+    truck = Truck.query.filter_by(
+        id=token).first()
+    address=Office.query.filter_by(id=truck.destinationBranch).first().officeAddress
+    if request.method == "POST":
+        truck.addtruckUsage(form.distance.data)
+        return redirect(url_for('dashboard_page'))
+    return render_template('google_maps_routes_usage.html',truck=truck,destination_address=address,form=form)
+
+@app.route('/google_maps_routes_bill/<token>', methods=["GET", "POST"])
+def google_maps_routes_bill_page(token):
+    form = TruckUsageForm()
+
+    consignment = Consignment.query.filter_by(
+        id=token).first()
+    office = Office.query.filter_by(
+        id=consignment.sourceBranchID
+    ).first()
+    src_address = office.officeAddress
+
+    des_office = Office.query.filter_by(
+        id=consignment.destinationBranchID
+    ).first()
+    address = des_office.officeAddress
+
+    bill = Bill.query.filter_by(id=consignment.bill_id).first()
+
+    if request.method == "POST":
+        bill.setAmount(form.distance.data,consignment.volume)
+        return redirect(f'/allocate_truck_consignment/{consignment.id}')
+    
+    return render_template('google_maps_routes_bill.html',source_address=src_address,destination_address=address,form=form)

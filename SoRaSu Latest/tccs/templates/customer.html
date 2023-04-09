@@ -36,7 +36,8 @@ Customer Page
             <div class="container">
                 <div class="carousel-caption">
                     <h1>Safe Logistic & Transport Solutions That Saves Our Valuable Time!</h1>
-                    <p>Its always safe and secure with us: we are the guardians to protect you and your consignments.</p>
+                    <p>Its always safe and secure with us: we are the guardians to protect you and your consignments.
+                    </p>
                     <p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
                 </div>
             </div>
@@ -66,7 +67,7 @@ Customer Page
     </a>
 </div>
 
-<section class="pricing-section" style="height: 100vh;">
+<section class="pricing-section" style="height: 60vh;">
     <div class="container">
         <div class="row justify-content-md-center">
             <div class="col-xl-5 col-lg-6 col-md-8">
@@ -126,26 +127,26 @@ Customer Page
     </div>
 </section>
 
-<div class="text-center" style="height: 100vh;">
-    <a href="{{ url_for('place_consignment_page') }}">
-        <button>
-            Place Consignment
-            <span class="first"></span>
-            <span class="second"></span>
-            <span class="third"></span>
-            <span class="fourth"></span>
-        </button>
-    </a>
-    <br><br><br><br><br><br><br><br>
-    <a href="{{ url_for('order_history_page') }}">
-        <button>
-            My Orders
-            <span class="first"></span>
-            <span class="second"></span>
-            <span class="third"></span>
-            <span class="fourth"></span>
-        </button>
-    </a>
-</div>
+<div id="manager">
+    <div class="container">
 
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <h5>Place Consignment</h5>
+                    <a href="{{ url_for('place_consignment_page') }}">Do</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <h5>My Orders</h5>
+                    <a href="{{ url_for('order_history_page') }}">Do</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

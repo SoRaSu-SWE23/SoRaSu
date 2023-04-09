@@ -24,16 +24,16 @@ class Bill(db.Model):
         super().__init__(**kwargs)
         self.date = timezone.localize(datetime.now())
 
-    def getAmount(senderAddress,receiverAddress):
-        return 100
+    def setAmount(self,distance,volume):
+        self.amount=25*(float(distance)/1000)*(volume/100)
+        db.session.commit()
+
     def getDate(self):
         return self.date
     def getPaymentID(self):
         return self.id
     def setDate(self,date):
         self.date = date
-    def setAmount(self,amount):
-        self.amount = amount
 
 class Address(db.Model):
     __tablename__ = 'address'
@@ -41,11 +41,11 @@ class Address(db.Model):
     addr = db.Column(db.String(length=100), nullable=False)
     city = db.Column(db.String(length=30), nullable=False)
     pincode = db.Column(db.String(length=6), nullable=False)
+    longitude = db.Column(db.Double())
+    latitude = db.Column(db.Double())
 
-    def __init__(self, addr=None, city=None, pincode=None):
-        self.addr = addr
-        self.city = city
-        self.pincode = pincode
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return f'<Address: {self.addr}' \
@@ -75,13 +75,12 @@ class Customer(db.Model, UserMixin):
     def check_password_correction(self, attempted_password)->bool:
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
     
+    def set_password(self, attempted_password):
+        self.password_hash = bcrypt.generate_password_hash(attempted_password).decode('utf-8')
+        db.session.commit()
+
     def getUsername(self):
         return self.username
-    # def placeOrder(self,consignment):
-    #     db.session.add(custom_consignment)
-    #     db.session.commit()
-    #     self.consignments.append(custom_consignment)
-    #     return custom_consignment.consignmentID
 
     def viewTruckRouteDetails(consignmentID):
         current_consignment = Consignment.query.filter_by(consignmentID)
@@ -208,13 +207,16 @@ class Truck(db.Model):
     destinationBranch = db.Column(db.Integer(), db.ForeignKey('office.id'))
     status = db.Column(db.Enum(TruckStatus))
     volumeConsumed = db.Column(db.Double(), nullable=False, default=0) # Volume consumed is in metre cube
-    usageTime = db.Column(db.Integer(),default=0) # Usage time is in hours
+    truckUsage = db.Column(db.Double(),default=0)
     idleTime = db.Column(db.Integer(),default=0) # Idle time is in hours
     driverID = db.Column(db.Integer(),db.ForeignKey('employee.id'))
     dispatch_time = db.Column(db.DateTime())
     arrival_time = db.Column(db.DateTime())
     journeys = db.Column(db.Integer(),default=0)
     total_idle_time = db.Column(db.Double(),default=0.0)
+    live_longitude = db.Column(db.Double())
+    live_latitude = db.Column(db.Double())
+
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -222,16 +224,6 @@ class Truck(db.Model):
         self.volumeConsumed = 0.00
         self.usageTime = 0.00
         self.idleTime = 0.00
-    # consignments = db.relationship(
-    #     "Consignment", secondary=join_table, back_populates="trucks")
-
-    # @property
-    # def branchid(self):
-    #     return self.branchid
-    # @branchid.setter
-    # def branchid(self,brancid_):
-    #     branch = Office.query.filter_by(id=brancid_)
-    #     self.currentBranch=branch.id
 
     def getTruckID(self):
         return self.id
@@ -293,6 +285,11 @@ class Truck(db.Model):
         self.driverID = i
         db.session.commit()
 
+    def setLiveLocation(self,lat,lng):
+        self.live_latitude=lat
+        self.live_longitude=lng
+        db.session.commit()
+
     def allocate_driver(self,token):
         assigned_trucks = list(Truck.query.filter_by(
                 branch_id=token, status=TruckStatus.ASSIGNED))
@@ -309,7 +306,9 @@ class Truck(db.Model):
                 assigned_trucks.remove(truck)
                 break
 
-
+    def addtruckUsage(self,kms):
+        self.truckUsage+= float(kms)/1000
+        db.session.commit()
 
 class Office(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

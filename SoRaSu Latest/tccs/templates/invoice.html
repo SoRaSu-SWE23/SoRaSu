@@ -37,7 +37,7 @@ Invoice Page
                     </div>
                     <div class="col invoice-details">
                         <h5 class="invoice-id">Invoice: 3-2-1</h5>
-                        <div class="date">Date of Invoice: 01/10/2018</div>
+                        <div class="date">Date of Invoice: {{ bill.date.strftime(" %d - %m - %Y ") }}</div>
                     </div>
                 </div>
                 <table >
@@ -56,24 +56,24 @@ Invoice Page
                             <td class="text-left">{{consignment.senderAddress.city}}</td>
                             <td class="text-left">{{consignment.receiverAddress.city}}</td>
                             <td class="unit">{{consignment.volume}}</td>
-                            <td class="qty">₹{{bill.amount}}</td>
+                            <td class="qty">₹{{bill.amount|round(2)}}</td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
                             <td colspan="2"></td>
                             <td colspan="2">SUBTOTAL</td>
-                            <td>₹{{bill.amount}}</td>
+                            <td>₹{{bill.amount|round(2)}}</td>
                         </tr>
                         <tr>
                             <td colspan="2"></td>
                             <td colspan="2">TAX 25%</td>
-                            <td>₹{{bill.amount * 0.25 }}</td>
+                            <td>₹{{(bill.amount|round(2) * 0.25)|round(2) }}</td>
                         </tr>
                         <tr>
                             <td colspan="2"></td>
                             <td colspan="2">GRAND TOTAL</td>
-                            <td>₹{{bill.amount *1.25 }}</td>
+                            <td>₹{{(bill.amount|round(2) *1.25)|round(2) }}</td>
                         </tr>
                     </tfoot>
                 </table>

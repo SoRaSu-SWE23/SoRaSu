@@ -37,10 +37,8 @@ class RegisterEmployeeForm(FlaskForm):
     username = StringField(label='User Name:', validators=[Length(min=2, max=30), DataRequired()])
     name = StringField(label='Name:', validators=[Length(min=2, max=30), DataRequired()])
     email_address = StringField(label='Email Address:', validators=[Email(), DataRequired()])
-    # branchID = IntegerField(label='Branch ID: ', validators=[DataRequired()])
     branchID = SelectField(label="Choose an option",coerce=int)
-    # position = StringField(label='Position: ', validators=[DataRequired()])
-    position = SelectField(label="Choose a Position",choices=[('Manager','Manager'),('Employee','Employee'),('Driver','Driver')])
+    position = SelectField(label="Choose a Position",choices=[('None','Select Position'),('Manager','Manager'),('Employee','Employee'),('Driver','Driver')])
     password1 = PasswordField(label='Password:', validators=[Length(min=6), DataRequired()])
     password2 = PasswordField(label='Confirm Password:', validators=[EqualTo('password1'), DataRequired()])
     submit = SubmitField(label='Create Account')
@@ -57,6 +55,15 @@ class LoginEmployeeForm(FlaskForm):
     password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Sign in')
 
+
+class ForgotPasswordForm_email(FlaskForm):
+    email = StringField(label='Email', validators=[DataRequired()])
+    submit = SubmitField(label='Change Password')
+    
+class ForgotPasswordForm_password(FlaskForm):
+    password = PasswordField(label='Password:', validators=[DataRequired()])
+    submit = SubmitField(label='Change Password')
+
 #---------------------------------------------------------------------------------------------------------------------------
 
 class ConsignmentForm(FlaskForm):
@@ -69,8 +76,6 @@ class ConsignmentForm(FlaskForm):
     receiver_city = StringField(label='Receiver City',validators=[DataRequired(),Length(max=100)])
     receiverPincode = StringField(label='Pincode',validators=[DataRequired(),Length(min=6,max=6)])
     volume = DecimalField(label="Volume",validators=[DataRequired(),NumberRange(min=1,max =1000)])
-    # dispatch_branch = IntegerField(label="Dispatch Branch", validators=[DataRequired()])
-    # receiver_branch = IntegerField(label="Receiver Branch", validators=[DataRequired()])
     dispatch_branch = SelectField('Choose an option',coerce=int)
     receiver_branch = SelectField('Choose an option',coerce=int)
     submit = SubmitField("Proceed") 
@@ -79,16 +84,15 @@ class ConsignmentForm(FlaskForm):
 
 class TruckForm(FlaskForm):
     truckNumber = StringField(label='Truck Number',validators=[Length(min=2,max=10),DataRequired()])
-    # branchID = IntegerField(label='Branch ID: ',validators=[DataRequired()])
     branchID = SelectField('Choose an option',coerce=int)
     submit = SubmitField(label='Add truck')
 
+class TruckStatusForm(FlaskForm):
+    Latitude = DecimalField(label='Latitude')
+    Longitude = DecimalField(label='Longitude')
+    submit = SubmitField(label='Update Status')
+
 #---------------------------------------------------------------------------------------------------------------------------
-
-class BranchQueryForm(FlaskForm):
-    Branch = IntegerField(label='Branch ID:', validators=[DataRequired()])
-    submit = SubmitField(label='Sign in')
-
 
 class ApproveTruckForm(FlaskForm):
     submit = SubmitField(label="Approve Truck")
@@ -105,5 +109,8 @@ class ApproveIncomingTruckForm(FlaskForm):
 class TruckAvailableForm(FlaskForm):
     submit = SubmitField(label="Make Truck Available")
 
-
+class TruckUsageForm(FlaskForm):
+    distance = DecimalField()
+    submit = SubmitField(label="Make Truck Available")
+    
 

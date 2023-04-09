@@ -20,7 +20,9 @@ View Consignment Status Page
             <th>Truck ID</th>
             <th>Truck Number</th>
             <th>Source Branch Name</th>
-            <th>status</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Live Status</th>
           </tr>
         </thead>
         <tbody>
@@ -33,11 +35,13 @@ View Consignment Status Page
             <td>{{truck.status.name}}</td>
             {% if truck.status.name == "DISPATCHED" %}
             <td>Driver Assigned</td>
+            <td><button class="btn btn-outline btn-success"><a href="/manager_google_maps/{{ truck.id }}" style="text-decoration: none; color: whitesmoke;">Check Status</a></button></td>
             {% else %}
               <td data-control="select">
                 <button class="btn btn-outline btn-success" data-toggle="modal"
                   data-target="#Modal-ApproveTruck-{{ truck.id }}">Approve</button>
               </td>
+              <td>Truck Not Enroute</td>
             {% endif %}
           </tr>
           {% endfor %}

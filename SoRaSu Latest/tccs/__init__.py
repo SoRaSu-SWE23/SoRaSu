@@ -18,6 +18,6 @@ def get():
     return user  
 
 
-login_manager.login_view = "login_customer_page"
+login_manager.login_view = "login_page"
 login_manager.login_message_category = "info"
 from tccs import routes

@@ -24,6 +24,10 @@
                 {{ form.submit() }}
             </div>
             <div class="link mb-3">
+                <h6>Forgot password ?</h6>
+                <a href="{{ url_for('forget_password_page') }}">Reset Password</a>
+            </div>
+            <div class="link mb-3">
                 <h6>Do not have an account?</h6>
                 <a href="{{ url_for('register_page') }}">Register</a>
             </div>

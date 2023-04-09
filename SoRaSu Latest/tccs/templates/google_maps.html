@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
+    />
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <title>Calculating a Location from a Mouse Click</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://js.api.here.com/v3/3.1/mapsjs-ui.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-core.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-service.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="extensions/filter-control/bootstrap-table-filter-control.css"
+    />
+
+    <style type="text/css">
+      #map {
+        width: 95%;
+        height: 85vh;
+        background: grey;
+      }
+
+      #panel {
+        width: 100%;
+        height: 400px;
+      }
+      .log {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        height: 150px;
+        width: 250px;
+        overflow: scroll;
+        background: white;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 12px;
+      }
+      .log-entry {
+        padding: 5px;
+        border-bottom: 1px solid #d0d9e9;
+      }
+      .log-entry:nth-child(odd) {
+        background-color: #e1e7f1;
+      }
+    </style>
+  </head>
+  <body id="markers-on-the-map">
+    <nav
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background-color: #101d25"
+    >
+      <a
+        class="nav-link"
+        href="{{ url_for('home_page') }}"
+        style="
+          color: white;
+          text-align: center;
+          font-style: italic;
+          font-weight: 700;
+          font-size: large;
+          text-decoration: none;
+          display: inline-block;
+        "
+        >SoRaSu</a
+      >
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('dashboard_page') }}"
+              >Dashboard <span class="sr-only">(current)</span></a
+            >
+          </li>
+          {% else %}
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('home_page') }}"
+              >Home <span class="sr-only">(current)</span></a
+            >
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('contact_us_page') }}">Contact Us</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#">Corporate Info</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Services</a>
+          </li>
+          <!-- <li class="nav-item">
+                    <button type="button" class="btn btn-outline-dark">
+                        <a class="nav-link" href="{{ url_for('register_page') }}">Register/Signup</a>
+                    </button>
+                </li> -->
+        </ul>
+        {% if current_user.is_authenticated %}
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link">Welcome {{ current_user.name }}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout_page') }}">Logout</a>
+          </li>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login_page') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register_page') }}"
+              >Register</a
+            >
+          </li>
+        </ul>
+        {% endif %}
+      </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="alert alert-{{ category }}"
+      style="position: absolute; width: 100%; z-index: 8"
+    >
+      <button
+        type="button"
+        class="m1-2 mb-1 close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+    <div class="container" >
+        <div class="card bg-dark text-white text-center mt-5 container" style="opacity: 0.8;">
+            <div class="card-body">
+                <div class="field">
+                    <button onclick="getLocation()" id="check"class="m-3">Check Location</button>
+                </div>
+
+                <form id="coordinated" style="display: none;" method="POST">
+                    {{ form.hidden_tag()}}
+                    <div class="field">
+                        <div class="fas">
+                            Latitude 
+                        </div>
+                        {{ form.Latitude(class="form-control",id="latitude", type="text", placeholder="latitude") }}
+                        <div class="fas">
+                            Longitude 
+                        </div>
+                        {{ form.Longitude(class="form-control",id="longitude", type="text", placeholder="longitude") }}
+                    </div>
+                    <div class="field">
+                        {{ form.submit() }}
+                    </div>
+                    <div class="container">
+                        <div id="map" style="margin-top: 2rem; "></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+      var latitude = document.getElementById("latitude");
+      var longitude = document.getElementById("longitude");
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            longitude.innerHTML = "Geolocation is not supported by this browser.";
+        }
+      }
+
+      function showPosition(position) {
+        latitude.value=position.coords.latitude 
+        longitude.value=position.coords.longitude
+        /**
+         * Moves the map to display over Berlin
+         *
+         * @param  {H.Map} map      A HERE Map instance within the application
+         */
+        document.getElementById('coordinated').style.display='block'
+        function moveMapToBerlin(map) {
+          map.setCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
+          map.setZoom(14);
+        }
+        var platform = new H.service.Platform({
+          apikey: "HQcs5KIWfISTlKjSNoc9llNUhCWwOxfNp_TV8RgAKDk",
+        });
+        var defaultLayers = platform.createDefaultLayers();
+        var map = new H.Map(
+          document.getElementById("map"),
+          defaultLayers.vector.normal.map,
+          {
+            center: { lat: position.coords.latitude, lng: position.coords.longitude },
+            zoom: 15,
+            pixelRatio: window.devicePixelRatio || 1,
+          }
+        );
+        window.addEventListener("resize", () => map.getViewPort().resize());
+        var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+        var ui = H.ui.UI.createDefault(map, defaultLayers);
+        var parisMarker = new H.map.Marker({lat:position.coords.latitude, lng:position.coords.longitude});
+        map.addObject(parisMarker);
+      }
+    </script>
+  </body>
+  <style>
+    body {
+      background: #466368;
+      background: linear-gradient(to right, #648880, #293f50);
+      color: white;
+    }
+
+     form {
+        margin-top: 40px;
+    }
+
+     form .field {
+        margin-top: 20px;
+        display: flex;
+    }
+    form #coordinated{
+        margin: 0;
+    }
+
+     .field .fas {
+        height: 50px;
+        color: #868686;
+        font-size: 1rem;
+        line-height: 50px;
+        border: 1px solid #444;
+        border-right: none;
+        border-radius: 5px 0 0 5px;
+        padding:0 1rem;
+        background: linear-gradient(#333, #222);
+    }
+
+     .field input,
+    form button {
+        height: 50px;
+        width: 100%;
+        outline: none;
+        font-size: 19px;
+        color: #64c569;
+        padding: 0 15px;
+        border-radius: 0 5px 5px 0;
+        border: 1px solid #444;
+        caret-color: #339933;
+        background: linear-gradient(#333, #222);
+    }
+    #check {
+        height: 50px;
+        width: 100%;
+        outline: none;
+        font-size: 19px;
+        color: #64c569;
+        padding: 0 15px;
+        border-radius: 0 5px 5px 0;
+        border: 1px solid #444;
+        caret-color: #339933;
+        background: linear-gradient(#333, #222);
+    }
+     input:focus {
+        color: #339933;
+        box-shadow: 0 0 5px rgba(0, 255, 0, .2),
+            inset 0 0 5px rgba(0, 255, 0, .1);
+        background: linear-gradient(#333933, #222922);
+        animation: glow .8s ease-out infinite alternate;
+    }
+
+    @keyframes glow {
+        0% {
+            border-color: #339933;
+            box-shadow: 0 0 5px rgba(0, 255, 0, .2),
+                inset 0 0 5px rgba(0, 0, 0, .1);
+        }
+
+        100% {
+            border-color: #6f6;
+            box-shadow: 0 0 20px rgba(0, 255, 0, .6),
+                inset 0 0 10px rgba(0, 255, 0, .4);
+        }
+    }
+
+     button {
+        margin-top: 30px;
+        border-radius: 5px !important;
+        font-weight: 600;
+        letter-spacing: 1px;
+        cursor: pointer;
+    }
+
+     button:hover {
+        color: #339933;
+        border: 1px solid #339933;
+        box-shadow: 0 0 5px rgba(0, 255, 0, .3),
+            0 0 10px rgba(0, 255, 0, .2),
+            0 0 15px rgba(0, 255, 0, .1),
+            0 2px 0 black;
+    }
+
+  </style>
+</html>
