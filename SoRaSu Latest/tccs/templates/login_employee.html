@@ -9,7 +9,7 @@ Login Customer Page
     <div id="unique_login" class=" container login-form d-flex flex-column bd-highlight mb-3 mt-5" style="width: 100%; height:fit-content;">
         <form method="POST">
             <div class="text">
-                LOGIN
+                LOGIN EMPLOYEE
             </div>
             {{ form.hidden_tag() }}
             <div class="field">
@@ -22,6 +22,10 @@ Login Customer Page
             </div>
             <div class="field">
                 {{ form.submit() }}
+            </div>
+            <div class="link mb-3">
+                <h6>Forgot password ?</h6>
+                <a href="{{ url_for('forget_password_employee_page') }}">Reset Password</a>
             </div>
             <div class="link mb-3">
                 <h6>Do not have an account?</h6>

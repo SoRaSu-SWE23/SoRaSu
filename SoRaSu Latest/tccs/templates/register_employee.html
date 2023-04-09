@@ -11,7 +11,7 @@ Register Customer Page
             style="width: 100%; height:fit-content;">
             <form method="POST">
                 <div class="text">
-                    REGISTER
+                    REGISTER EMPLOYEE
                 </div>
                 {{ form.hidden_tag() }}
                 <div class="field">
@@ -46,8 +46,8 @@ Register Customer Page
                     {{ form.submit() }}
                 </div>
                 <div class="link mb-3">
-                    <h6>Do not have an account?</h6>
-                    <a href="{{ url_for('register_page') }}">Register</a>
+                    <h6>Already have an account?</h6>
+                    <a href="{{ url_for('login_employee_page') }}">Login</a>
                 </div>
             </form>
         </div>

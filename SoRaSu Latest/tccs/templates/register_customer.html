@@ -10,7 +10,7 @@
     <div id="unique_login" class=" container login-form d-flex flex-column bd-highlight mb-3 mt-5" style="width: 100%; height:fit-content;">
         <form method="POST">
             <div class="text">
-                REGISTER
+                REGISTER CUSTOMER
             </div>
             {{ form.hidden_tag() }}
             <div class="field" >
@@ -37,8 +37,8 @@
                 {{ form.submit() }}
             </div>
             <div class="link mb-3">
-                <h6>Do not have an account?</h6>
-                <a href="{{ url_for('register_page') }}">Register</a>
+                <h6>Already have an account?</h6>
+                <a href="{{ url_for('login_customer_page') }}">Login</a>
             </div>
         </form>
     </div>

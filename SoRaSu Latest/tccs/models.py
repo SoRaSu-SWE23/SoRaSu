@@ -123,6 +123,10 @@ class Employee(db.Model, UserMixin):
     @password.setter
     def password(self, plain_text_password):
         self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
+
+    def set_password(self, attempted_password):
+        self.password_hash = bcrypt.generate_password_hash(attempted_password).decode('utf-8')
+        db.session.commit()
     
     def check_password_correction(self,attempted_password):
         return bcrypt.check_password_hash(self.password_hash,attempted_password)

@@ -284,6 +284,25 @@ def forget_password_page():
 
     return render_template('forget_password.html', form2=form2, form1=form1)
 
+@app.route('/forget_password_employee', methods=['GET', 'POST'])
+def forget_password_employee_page():
+    form1 = ForgotPasswordForm_email()
+    form2 = ForgotPasswordForm_password()
+    # if form1.validate_on_submit():
+    #     form.email.data=form1.email.data
+    if form2.validate_on_submit():
+        attempted_user = Employee.query.filter_by(
+            email_address=form1.email.data).first()
+        if attempted_user:
+            attempted_user.set_password(form2.password.data)
+            flash(
+                f"password changed succesfully", category='success')
+            return redirect(url_for('login_employee_page'))
+        else:
+            flash("Please try again", category='danger')
+
+    return render_template('forget_password.html', form2=form2, form1=form1)
+
 
 # -------------------------------------------------------PLACE_CONSIGNMENT PAGE-----------------------------------------------------------
 @app.route('/place_consignment', methods=['GET', 'POST'])
